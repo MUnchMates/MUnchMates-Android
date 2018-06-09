@@ -4,4 +4,22 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="getin">LogIn / Create Account</string>
+
+    <string name="search">Search</string>
+    <string name="messages">Messages</string>
+    <string name="filter">Filter by:</string>
+    <string name="all">all</string>
+
+    <string name="profile">Profile</string>
+
+    <string name="mtype">MateType: </string>
+    <string name="college">College: </string>
+    <string name="clubs">Clubs / Organizations</string>
+
+    <string-array name="groups">
+        <item>club / organization</item>
+        <item>college</item>
+        <item>mate type</item>
+        <item>meal plan</item>
+    </string-array>
 </resources>

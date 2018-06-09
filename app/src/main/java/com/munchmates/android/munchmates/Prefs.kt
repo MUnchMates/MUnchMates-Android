@@ -42,7 +42,10 @@ class Prefs(c: Context) {
             is String -> edit.putString(pref[0], value)
             is Int -> edit.putInt(pref[0], value)
             is Boolean -> edit.putBoolean(pref[0], value)
-            else -> return false
+            else -> {
+                println("Unknown type passed")
+                return false
+            }
         }
         edit.commit()
         return true

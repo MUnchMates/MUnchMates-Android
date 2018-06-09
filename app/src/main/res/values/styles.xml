@@ -15,4 +15,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@drawable/splash</item>
     </style>
+
+    <style parent="@android:style/Widget.Spinner" name="SpinnerAsLink">
+        <item name="android:background">#00000000</item>
+    </style>
 </resources>

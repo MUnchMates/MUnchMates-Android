@@ -10,15 +10,19 @@ class MMActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mm)
-
         Prefs.setInstance(this)
-
-        startActivity(Intent(this, LoginActivity::class.java))
+        load()
     }
 
     fun load() {
+        val c = this
         doAsync {
-
+            if(Prefs.instance.getStr(Prefs.EMAIL_PREF) != "" && Prefs.instance.getStr(Prefs.PASSWORD_PREF) != "") {
+                //attempt login
+                startActivity(Intent(c, HomeActivity::class.java))
+                return@doAsync
+            }
+            startActivity(Intent(c, LoginActivity::class.java))
         }
     }
 }

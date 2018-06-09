@@ -22,6 +22,14 @@
         <activity android:name=".LoginActivity"
             android:theme="@style/AppTheme">
         </activity>
+
+        <activity android:name=".HomeActivity"
+            android:theme="@style/AppTheme">
+        </activity>
+
+        <activity android:name=".ProfileActivity"
+            android:theme="@style/AppTheme">
+        </activity>
     </application>
 
 </manifest>
