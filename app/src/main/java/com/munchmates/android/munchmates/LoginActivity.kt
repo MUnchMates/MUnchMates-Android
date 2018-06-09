@@ -3,8 +3,8 @@ package com.munchmates.android.munchmates
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_login.*
+import org.jetbrains.anko.toast
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -19,7 +19,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             R.id.login_button_login -> {
                 val email = login_edit_email.text
                 val password = login_edit_password.text
-                Toast.makeText(this, "$email :: $password", Toast.LENGTH_SHORT).show()
+                toast("$email :: $password")
             }
         }
     }

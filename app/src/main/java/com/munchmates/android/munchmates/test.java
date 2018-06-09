@@ -8,24 +8,11 @@ import android.widget.Button;
 
 public class test extends AppCompatActivity {
 
-    private Button awesomeButton;
+    public void pass(Object obj)
+    {
+        if(obj instanceof String)
+        {
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        awesomeButton = new Button(this);
-
-        awesomeButton.setOnClickListener(new AwesomeButtonClick());
-    }
-
-    private void awesomeButtonClicked() {
-        awesomeButton.setText("AWESOME!");
-    }
-
-    class AwesomeButtonClick implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            awesomeButtonClicked();
         }
     }
 }
