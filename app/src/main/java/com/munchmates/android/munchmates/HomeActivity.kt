@@ -54,10 +54,11 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
     override fun onClick(v: View?) {
         when(v?.id) {
             R.id.home_button_search -> {
-
+                val intent = Intent(this, SearchActivity::class.java)
+                startActivity(intent)
             }
             R.id.home_button_messages -> {
-
+                startActivity(Intent(this, MessageActivity::class.java))
             }
         }
     }
