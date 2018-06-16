@@ -3,7 +3,8 @@
 
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="getin">LogIn / Create Account</string>
+    <string name="login">Log In</string>
+    <string name="create">Create Account</string>
 
     <string name="search">Search</string>
     <string name="messages">Messages</string>
@@ -22,7 +23,7 @@
     <string name="updatehead">Update Headshot</string>
     <string name="mute">MUteMode</string>
     <string name="mplan">Mean Plan?</string>
-    <string name="notif">Notification</string>
+    <string name="notif">Notifications</string>
     <string name="town">Hometown</string>
     <string name="state">State</string>
     <string name="helpdesk">Help Desk</string>

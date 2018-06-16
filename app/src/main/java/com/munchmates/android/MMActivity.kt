@@ -1,8 +1,9 @@
-package com.munchmates.android.munchmates
+package com.munchmates.android
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.google.firebase.auth.FirebaseAuth
 import org.jetbrains.anko.doAsync
 
 class MMActivity : AppCompatActivity() {
@@ -17,12 +18,14 @@ class MMActivity : AppCompatActivity() {
     fun load() {
         val c = this
         doAsync {
-            if(Prefs.instance.getStr(Prefs.EMAIL_PREF) != "" && Prefs.instance.getStr(Prefs.PASSWORD_PREF) != "") {
-                //attempt login
-                startActivity(Intent(c, HomeActivity::class.java))
-                return@doAsync
+            if(FirebaseAuth.getInstance().currentUser == null) {
+                // requires login
+                startActivity(Intent(c, LoginActivity::class.java))
             }
-            startActivity(Intent(c, LoginActivity::class.java))
+            else {
+                // enter app
+                startActivity(Intent(c, HomeActivity::class.java))
+            }
         }
     }
 }

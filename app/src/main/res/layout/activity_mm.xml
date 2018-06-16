@@ -5,5 +5,5 @@
     android:id="@+id/activity_splash"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.munchmates.android.munchmates.MMActivity">
+    tools:context="com.munchmates.android.MMActivity">
 </RelativeLayout>

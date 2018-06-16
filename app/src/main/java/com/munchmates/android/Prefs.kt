@@ -1,4 +1,4 @@
-package com.munchmates.android.munchmates
+package com.munchmates.android
 
 import android.content.Context
 import android.content.SharedPreferences
