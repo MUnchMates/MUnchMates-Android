@@ -84,6 +84,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun success(user: FirebaseUser) {
         toast("Welcome ${user!!.email}!")
+        App.init()
         startActivity(Intent(this, HomeActivity::class.java))
     }
 

@@ -12,17 +12,19 @@
     <string name="all">all</string>
 
     <string name="profile">Profile</string>
+    <string name="edit">Edit</string>
+    <string name="message">Message</string>
 
     <string name="mtype">MateType: </string>
     <string name="college">College: </string>
-    <string name="clubs">Clubs / Organizations</string>
+    <string name="clubs">Clubs &amp; Organizations:</string>
     <string name="add">Add</string>
 
     <string name="first">First Name</string>
     <string name="last">Last Name</string>
     <string name="updatehead">Update Headshot</string>
     <string name="mute">MUteMode</string>
-    <string name="mplan">Mean Plan?</string>
+    <string name="mplan">Meal Plan?</string>
     <string name="notif">Notifications</string>
     <string name="town">Hometown</string>
     <string name="state">State</string>
@@ -31,6 +33,9 @@
     <string name="delacct">Delete Account</string>
     <string name="save">Save</string>
     <string name="logout">Log Out</string>
+
+    <string name="m">M</string>
+    <string name="spacer">\@</string>
 
     <string-array name="groups">
         <item>club / organization</item>

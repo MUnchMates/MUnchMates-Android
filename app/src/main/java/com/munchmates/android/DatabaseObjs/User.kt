@@ -9,7 +9,6 @@ data class User (
         val stateCountry: String = "",
         val firstName: String = "",
         val uid: String = "",
-        val lastOpened: String = "",
         val mateType: String = "",
         val email: String = "",
         val mealPlan: Boolean = false,

@@ -23,6 +23,7 @@ class MMActivity : AppCompatActivity() {
                 startActivity(Intent(c, LoginActivity::class.java))
             }
             else {
+                App.init()
                 // enter app
                 startActivity(Intent(c, HomeActivity::class.java))
             }

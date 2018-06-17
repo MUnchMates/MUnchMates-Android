@@ -32,16 +32,14 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/settings_image_head"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_width="128dp"
+                android:layout_height="128dp"/>
 
             <TextView
                 android:id="@+id/settings_text_head"

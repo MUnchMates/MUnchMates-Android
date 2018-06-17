@@ -42,6 +42,10 @@
         <activity android:name=".MessageActivity"
             android:theme="@style/AppTheme">
         </activity>
+
+        <activity android:name=".ConversationActivity"
+            android:theme="@style/AppTheme">
+        </activity>
     </application>
 
 </manifest>

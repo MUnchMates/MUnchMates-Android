@@ -8,6 +8,12 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.munchmates.android.DatabaseObjs.*
 import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
@@ -27,7 +33,7 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         val gAdapter = ArrayAdapter(this, R.layout.item_link, arrayOf("all"))
         gAdapter.setDropDownViewResource(R.layout.item_spinner)
         home_spinner_group.adapter = gAdapter
-        home_spinner_group.onItemSelectedListener = this
+        //home_spinner_group.onItemSelectedListener = this
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -38,7 +44,9 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.action_profile -> {
-                startActivity(Intent(this, ProfileActivity::class.java))
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.putExtra("uid", FirebaseAuth.getInstance().currentUser?.uid)
+                startActivity(intent)
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
@@ -47,6 +55,24 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         home_text_whatgroup.text = "Which ${resources.getStringArray(R.array.groups)[home_spinner_type.selectedItemPosition]}?"
+        var names = arrayListOf<String>()
+        when(home_spinner_type.selectedItemPosition) {
+            0 -> { // club
+                names = App.clubs
+            }
+            1 -> { // college
+                names = App.colleges
+            }
+            2 -> { // mate type
+                names = App.mates
+            }
+            3 -> { //meal plan
+                names = App.plans
+            }
+        }
+        val gAdapter = ArrayAdapter(this, R.layout.item_link, names)
+        gAdapter.setDropDownViewResource(R.layout.item_spinner)
+        home_spinner_group.adapter = gAdapter
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -55,6 +81,8 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         when(v?.id) {
             R.id.home_button_search -> {
                 val intent = Intent(this, SearchActivity::class.java)
+                intent.putExtra("type", home_spinner_type.selectedItemPosition)
+                intent.putExtra("group", home_spinner_group.selectedItem as String)
                 startActivity(intent)
             }
             R.id.home_button_messages -> {
