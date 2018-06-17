@@ -12,13 +12,19 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.munchmates.android.DatabaseObjs.Sender
+import com.munchmates.android.DatabaseObjs.User
 import kotlinx.android.synthetic.main.activity_list.*
+import org.jetbrains.anko.backgroundColorResource
+import org.jetbrains.anko.backgroundResource
 
-class MessageActivity : AppCompatActivity(), ValueEventListener {
+class MessageActivity : AppCompatActivity() {
+
+    val dialog = LoadingDialog(::respond)
+    val usersRef = FirebaseDatabase.getInstance().reference
+    val senders = arrayListOf<Sender>()
+    val users = arrayListOf<User>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,39 +34,46 @@ class MessageActivity : AppCompatActivity(), ValueEventListener {
     }
 
     private fun getMessages() {
-        val usersRef = FirebaseDatabase.getInstance().reference
-        usersRef.child("USERS/${FirebaseAuth.getInstance().currentUser?.uid}/conversations/senderList").orderByChild("timeStamp").addValueEventListener(this)
+        dialog.show(fragmentManager.beginTransaction(), "dialog")
+
+        usersRef.child("USERS/${FirebaseAuth.getInstance().currentUser?.uid}/conversations/senderList").orderByChild("timeStamp").addValueEventListener(dialog)
     }
 
-    override fun onCancelled(error: DatabaseError) {}
-
-    override fun onDataChange(snapshot: DataSnapshot) {
-        val senders = arrayListOf<Sender>()
-        for(child in snapshot.children) {
-            senders.add(child.getValue<Sender>(Sender::class.java)!!)
+    private fun respond(snapshot: DataSnapshot) {
+        if(snapshot.ref.toString().contains("senderList")) {
+            for(child in snapshot.children) {
+                val sender = child.getValue<Sender>(Sender::class.java)!!
+                usersRef.child("USERS/${sender.uid}").addValueEventListener(dialog)
+                senders.add(sender)
+            }
         }
-
-        val adapter = SenderAdapter(this, senders)
-        list_list_list.adapter = adapter
-        list_list_list.onItemClickListener = adapter
+        else {
+            users.add(snapshot.getValue<User>(User::class.java)!!)
+            if(users.size == senders.size) {
+                val adapter = SenderAdapter(this, senders, users)
+                list_list_list.adapter = adapter
+                list_list_list.onItemClickListener = adapter
+                dialog.dismiss()
+            }
+        }
     }
 
-    private class SenderAdapter(private val context: Context, private val list: ArrayList<Sender>): BaseAdapter(), AdapterView.OnItemClickListener {
+    private class SenderAdapter(private val context: Context, private val senders: ArrayList<Sender>, private val users: ArrayList<User>): BaseAdapter(), AdapterView.OnItemClickListener {
 
         override fun onItemClick(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
             val intent = Intent(context, ConversationActivity::class.java)
-            intent.putExtra("uid", list[pos].uid)
+            intent.putExtra("uid", senders[pos].uid)
             context.startActivity(intent)
         }
 
         private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
         override fun getCount(): Int {
-            return list.size
+            return senders.size
         }
 
         override fun getItem(position: Int): Any {
-            return list[position]
+            return senders[position]
         }
 
         override fun getItemId(position: Int): Long {
@@ -68,19 +81,21 @@ class MessageActivity : AppCompatActivity(), ValueEventListener {
         }
 
         override fun getView(pos: Int, convertView: View?, parent: ViewGroup): View {
-            val rowView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false)
+            val rowView = inflater.inflate(R.layout.item_search_result, parent, false)
 
-            val sender = list[pos]
-            rowView.findViewById<TextView>(android.R.id.text1).setText("${sender.userDisplayName}")
-            var read = "Not read"
-            if(sender.read) read = "Read"
-            rowView.findViewById<TextView>(android.R.id.text2).setText("Last Message: $read")
-            //rowView.findViewById<TextView>(R.id.result_text_college).setText("${user.college}")
-            //rowView.findViewById<TextView>(R.id.result_text_class).setText("${user.mateType}")
+            val sender = senders[pos]
+            val user = users[pos]
+            rowView.findViewById<TextView>(R.id.result_text_name).setText(sender.userDisplayName)
+            rowView.findViewById<TextView>(R.id.result_text_class).setText(user.mateType)
+            rowView.findViewById<TextView>(R.id.result_text_college).setText(user.college)
 
-            //if(user.mealPlan) {
-            //    rowView.findViewById<TextView>(R.id.result_text_m).visibility = View.VISIBLE
-            //}
+            if(user.mealPlan) {
+                rowView.findViewById<TextView>(R.id.result_text_m).visibility = View.VISIBLE
+            }
+
+            if(!sender.read) {
+                rowView.backgroundResource = R.color.colorAccent
+            }
 
             return rowView
         }
