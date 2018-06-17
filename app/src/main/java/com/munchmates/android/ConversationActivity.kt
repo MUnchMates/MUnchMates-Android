@@ -1,51 +1,56 @@
 package com.munchmates.android
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.munchmates.android.DatabaseObjs.Message
-import com.munchmates.android.DatabaseObjs.Sender
+import com.munchmates.android.DatabaseObjs.User
 import kotlinx.android.synthetic.main.activity_list.*
 
 class ConversationActivity : AppCompatActivity(), ValueEventListener {
+
+    var users: ArrayList<User> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-        getMessages(intent.getStringExtra("uid"))
+        var uid = intent.getStringExtra("uid")
+        FirebaseDatabase.getInstance().reference.child("USERS/${FirebaseAuth.getInstance().currentUser?.uid}").addValueEventListener(this)
+        FirebaseDatabase.getInstance().reference.child("USERS/$uid").addValueEventListener(this)
+        getMessages(uid)
     }
 
     private fun getMessages(uid: String) {
-        val usersRef = FirebaseDatabase.getInstance().reference
-        usersRef.child("USERS/${FirebaseAuth.getInstance().currentUser?.uid}/conversations/messageList/$uid/messages").orderByChild("timeStamp").addValueEventListener(this)
+        var msgRef = FirebaseDatabase.getInstance().reference.child("USERS/${FirebaseAuth.getInstance().currentUser?.uid}/conversations/messageList/$uid/messages")
+        msgRef.orderByChild("timeStamp").addValueEventListener(this)
     }
 
     override fun onCancelled(error: DatabaseError) {}
 
     override fun onDataChange(snapshot: DataSnapshot) {
-        val messages = arrayListOf<Message>()
-        for(child in snapshot.children) {
-            messages.add(child.getValue<Message>(Message::class.java)!!)
-        }
+        if(snapshot.ref.toString().contains("messages")) {
+            val messages = arrayListOf<Message>()
+            for(child in snapshot.children) {
+                messages.add(child.getValue<Message>(Message::class.java)!!)
+            }
 
-        val adapter = MessagesAdapter(this, messages)
-        list_list_list.adapter = adapter
+            val adapter = MessagesAdapter(this, messages, users)
+            list_list_list.adapter = adapter
+        }
+        else {
+            users.add(snapshot.getValue<User>(User::class.java)!!)
+        }
     }
 
-    private class MessagesAdapter(private val context: Context, private val list: ArrayList<Message>): BaseAdapter() {
+    private class MessagesAdapter(private val context: Context, private val list: ArrayList<Message>, private val users: ArrayList<User>): BaseAdapter() {
 
         private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -64,15 +69,14 @@ class ConversationActivity : AppCompatActivity(), ValueEventListener {
         override fun getView(pos: Int, convertView: View?, parent: ViewGroup): View {
             val rowView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false)
 
-            val sender = list[pos]
-            rowView.findViewById<TextView>(android.R.id.text1).setText("${sender.text}")
-            rowView.findViewById<TextView>(android.R.id.text2).setText("From: ${sender.sender_id}")
-            //rowView.findViewById<TextView>(R.id.result_text_college).setText("${user.college}")
-            //rowView.findViewById<TextView>(R.id.result_text_class).setText("${user.mateType}")
-
-            //if(user.mealPlan) {
-            //    rowView.findViewById<TextView>(R.id.result_text_m).visibility = View.VISIBLE
-            //}
+            val message = list[pos]
+            rowView.findViewById<TextView>(android.R.id.text1).setText("${message.text}")
+            rowView.findViewById<TextView>(android.R.id.text2).setText("From: ${message.sender_id}")
+            for(user in users) {
+                if(message.sender_id == user.uid) {
+                    rowView.findViewById<TextView>(android.R.id.text2).setText("From: ${user.firstName} ${user.lastName}")
+                }
+            }
 
             return rowView
         }
