@@ -1,15 +1,18 @@
 package com.munchmates.android.DatabaseObjs
 
 data class User (
-        val college: String = "",
-        val emailNotifications: Boolean = false,
-        val lastName: String = "",
-        val muteMode: Boolean = false,
-        val city: String = "",
-        val stateCountry: String = "",
-        val firstName: String = "",
-        val uid: String = "",
-        val mateType: String = "",
-        val email: String = "",
-        val mealPlan: Boolean = false,
-        val clubsOrgs: HashMap<String, Club> = hashMapOf())
+        var uid: String = "",
+        var email: String = "",
+        var firstName: String = "",
+        var lastName: String = "",
+        var city: String = "",
+        var stateCountry: String = "",
+        var mateType: String = "",
+        var college: String = "",
+        var emailNotifications: Boolean = false,
+        var muteMode: Boolean = false,
+        var mealPlan: Boolean = false,
+        var searchOrderNumber: Int = 0,
+        var lastOpened: String = "",
+        var clubsOrgs: HashMap<String, Club> = hashMapOf(),
+        var conversations: HashMap<String, Conversation> = hashMapOf())

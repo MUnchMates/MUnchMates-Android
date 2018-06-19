@@ -24,6 +24,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener, ValueEventLis
         setContentView(R.layout.activity_profile)
 
         uid = intent.getStringExtra("uid")
+        println("UID: $uid")
         if(uid != FirebaseAuth.getInstance().currentUser?.uid) {
             profile_button_add.visibility = View.GONE
         }
