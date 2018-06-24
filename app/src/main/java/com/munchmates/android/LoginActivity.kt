@@ -60,26 +60,26 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun createAccount(email: String, password: String) {
         val auth = FirebaseAuth.getInstance()
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, OnCompleteListener<AuthResult> { task ->
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
             if(task.isSuccessful) {
                 success(auth.currentUser!!)
             }
             else {
                 failure(task.exception!!)
             }
-        })
+        }
     }
 
     private fun login(email: String, password: String) {
         val auth = FirebaseAuth.getInstance()
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, OnCompleteListener<AuthResult> { task ->
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
             if(task.isSuccessful) {
                 success(auth.currentUser!!)
             }
             else {
                 failure(task.exception!!)
             }
-        })
+        }
     }
 
     private fun success(user: FirebaseUser) {

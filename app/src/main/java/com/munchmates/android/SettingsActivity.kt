@@ -8,7 +8,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -17,6 +21,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.munchmates.android.DatabaseObjs.User
 import kotlinx.android.synthetic.main.activity_settings.*
+import org.jetbrains.anko.toast
 import java.io.ByteArrayOutputStream
 
 class SettingsActivity : AppCompatActivity(), View.OnClickListener {
@@ -34,6 +39,9 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
         settings_button_logout.setOnClickListener(this)
         settings_button_save.setOnClickListener(this)
         settings_text_head.setOnClickListener(this)
+        settings_button_pwreset.setOnClickListener(this)
+        settings_button_delacct.setOnClickListener(this)
+        settings_button_helpdesk.setOnClickListener(this)
 
         val gAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, App.mates)
         gAdapter.setDropDownViewResource(R.layout.item_spinner)
@@ -126,6 +134,35 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
                     stoRef.putBytes(stream.toByteArray())
                 }
                 finish()
+            }
+            R.id.settings_button_helpdesk -> {
+                intent = Intent(Intent.ACTION_SEND)
+                intent.setType("plain/text")
+                intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("munchmates@marquette.edu"))
+                intent.putExtra(Intent.EXTRA_SUBJECT, "HELPDESK REQUEST")
+                startActivity(Intent.createChooser(intent, "Send helpdesk email..."))
+            }
+            R.id.settings_button_pwreset -> {
+                FirebaseAuth.getInstance().sendPasswordResetEmail(user.email).addOnCompleteListener(this) { task ->
+                    if(task.isSuccessful) {
+                        toast("Password reset email sent")
+                    }
+                    else {
+                        toast("Error sending password reset email")
+                    }
+                }
+            }
+            R.id.settings_button_delacct -> {
+                FirebaseAuth.getInstance().currentUser!!.delete().addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        toast("Account successfully deleted")
+                        Prefs.instance.put(Prefs.EMAIL_PREF, "")
+                        Prefs.instance.put(Prefs.PASSWORD_PREF, "")
+                        startActivity(Intent(this, MMActivity::class.java))
+                    } else {
+                        toast("Error deleting account")
+                    }
+                }
             }
         }
     }
