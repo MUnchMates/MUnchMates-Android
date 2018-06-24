@@ -19,13 +19,14 @@ import com.munchmates.android.DatabaseObjs.User
 import kotlinx.android.synthetic.main.activity_settings.*
 import java.io.ByteArrayOutputStream
 
-class SettingsActivity : AppCompatActivity(), View.OnClickListener, ValueEventListener {
+class SettingsActivity : AppCompatActivity(), View.OnClickListener {
 
     var usersRef = FirebaseDatabase.getInstance().reference
     var stoRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://munch-mates-marquette.appspot.com/imgProfilePictures/")
     var user = User()
     val CODE = 7
     var newImage: Bitmap? = null
+    val dialog = LoadingDialog(::respond)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,9 +47,11 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener, ValueEventLi
     }
 
     private fun fillPage() {
+        dialog.show(fragmentManager.beginTransaction(), "dialog")
+
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         usersRef = usersRef.child("USERS/$uid")
-        usersRef.addValueEventListener(this)
+        usersRef.addValueEventListener(dialog)
 
         stoRef = stoRef.child("$uid.png")
         Glide.with(this)
@@ -56,9 +59,7 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener, ValueEventLi
                 .into(settings_image_head)
     }
 
-    override fun onCancelled(error: DatabaseError) {}
-
-    override fun onDataChange(snapshot: DataSnapshot) {
+    fun respond(snapshot: DataSnapshot) {
         user = snapshot.getValue<User>(User::class.java)!!
 
         settings_edit_first.setText(user.firstName)
@@ -69,6 +70,8 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener, ValueEventLi
         settings_switch_mute.isChecked = user.muteMode
         settings_switch_meal.isChecked = user.mealPlan
         settings_switch_notif.isChecked = user.emailNotifications
+
+        dialog.dismiss()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

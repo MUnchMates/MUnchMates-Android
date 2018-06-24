@@ -15,4 +15,4 @@ data class User (
         var searchOrderNumber: Int = 0,
         var lastOpened: String = "",
         var clubsOrgs: HashMap<String, Club> = hashMapOf(),
-        var conversations: HashMap<String, Conversation> = hashMapOf())
+        var conversations: Conversation = Conversation())

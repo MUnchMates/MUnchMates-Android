@@ -12,12 +12,14 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
+import com.munchmates.android.DatabaseObjs.Sender
 import com.munchmates.android.DatabaseObjs.User
+import kotlinx.android.synthetic.main.activity_list.*
 import kotlinx.android.synthetic.main.activity_profile.*
 
-class ProfileActivity : AppCompatActivity(), View.OnClickListener, ValueEventListener {
-
+class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     var uid = ""
+    val dialog = LoadingDialog(::respond)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,8 +36,10 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener, ValueEventLis
     }
 
     private fun fillPage() {
+        dialog.show(fragmentManager.beginTransaction(), "dialog")
+
         val userRef = FirebaseDatabase.getInstance().reference
-        userRef.child("USERS/$uid").addValueEventListener(this)
+        userRef.child("USERS/$uid").addValueEventListener(dialog)
 
         val storage = FirebaseStorage.getInstance()
         val stoRef = storage.getReferenceFromUrl("gs://munch-mates-marquette.appspot.com/imgProfilePictures/").child("$uid.png")
@@ -44,7 +48,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener, ValueEventLis
                 .into(profile_image_avatar)
     }
 
-    override fun onDataChange(snapshot: DataSnapshot) {
+    private fun respond(snapshot: DataSnapshot) {
         val user = snapshot.getValue<User>(User::class.java)!!
 
         profile_text_name.text = "${user.firstName} ${user.lastName}"
@@ -65,9 +69,8 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener, ValueEventLis
             view.text = "- ${club.clubsOrgsName}"
             profile_list_clubs.addView(view)
         }
+        dialog.dismiss()
     }
-
-    override fun onCancelled(error: DatabaseError) {}
 
     override fun onClick(v: View?) {
         when(v?.id) {

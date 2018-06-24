@@ -10,14 +10,12 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.TextView
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.munchmates.android.DatabaseObjs.*
 import kotlinx.android.synthetic.main.activity_list.*
 
-class SearchActivity : AppCompatActivity(), ValueEventListener {
+class SearchActivity : AppCompatActivity() {
+    val dialog = LoadingDialog(::respond)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,36 +29,42 @@ class SearchActivity : AppCompatActivity(), ValueEventListener {
     }
 
     private fun getResults(type: Int, group: String) {
+        dialog.show(fragmentManager.beginTransaction(), "dialog")
+
         val usersRef = FirebaseDatabase.getInstance().reference.child("USERS")
         when(type) {
             0 -> { // club
-                usersRef.addValueEventListener(this)
+                usersRef.addValueEventListener(dialog)
             }
             1 -> { // college
-                usersRef.orderByChild("college").equalTo(group).addValueEventListener(this)
+                usersRef.orderByChild("college").equalTo(group).addValueEventListener(dialog)
             }
             2 -> { // mate type
-                usersRef.orderByChild("mateType").equalTo(group).addValueEventListener(this)
+                usersRef.orderByChild("mateType").equalTo(group).addValueEventListener(dialog)
             }
             3 -> { //meal plan
-                usersRef.orderByChild("mealPlan").equalTo(group == "Yes").addValueEventListener(this)
+                usersRef.orderByChild("mealPlan").equalTo(group == "Yes").addValueEventListener(dialog)
             }
         }
     }
 
-    override fun onCancelled(error: DatabaseError) {}
-
-    override fun onDataChange(snapshot: DataSnapshot) {
+    fun respond(snapshot: DataSnapshot) {
         val users = arrayListOf<User>()
+        println("Number of results ${snapshot.childrenCount}")
         for(user in snapshot.children) {
-            val user = user.getValue<User>(User::class.java)!!
-            if(intent.getIntExtra("type", 0) == 0) {
-                for(club in user.clubsOrgs.values) {
-                    if(club.clubsOrgsName == intent.getStringExtra("group")) users.add(user)
+            try {
+                val user = user.getValue<User>(User::class.java)!!
+                if(intent.getIntExtra("type", 0) == 0) {
+                    for(club in user.clubsOrgs.values) {
+                        if(club.clubsOrgsName == intent.getStringExtra("group")) users.add(user)
+                    }
                 }
-            }
-            else {
-                users.add(user)
+                else {
+                    users.add(user)
+                }
+            } catch (e: DatabaseException) {
+                println("Bad value on new user:")
+                println(user.value)
             }
         }
 
@@ -68,6 +72,8 @@ class SearchActivity : AppCompatActivity(), ValueEventListener {
         val adapter = UserAdapter(this, users)
         list_list_list.adapter = adapter
         list_list_list.onItemClickListener = adapter
+
+        dialog.dismiss()
     }
 
     private class UserAdapter(private val context: Context, private val list: ArrayList<User>): BaseAdapter(), AdapterView.OnItemClickListener {
