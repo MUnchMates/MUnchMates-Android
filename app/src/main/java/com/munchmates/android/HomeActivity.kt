@@ -15,6 +15,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.munchmates.android.DatabaseObjs.*
 import kotlinx.android.synthetic.main.activity_home.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
 
@@ -34,6 +36,10 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         gAdapter.setDropDownViewResource(R.layout.item_spinner)
         home_spinner_group.adapter = gAdapter
         //home_spinner_group.onItemSelectedListener = this
+
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+        FirebaseDatabase.getInstance().reference.child("USERS/$uid/lastOpened").setValue(SimpleDateFormat("M.d.yyyy • H:mm:ss").format(Date()))
+        println("User: $uid")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

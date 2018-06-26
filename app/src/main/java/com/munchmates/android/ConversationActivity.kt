@@ -12,20 +12,27 @@ import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.munchmates.android.DatabaseObjs.Message
+import com.munchmates.android.DatabaseObjs.MsgObj
+import com.munchmates.android.DatabaseObjs.Sender
 import com.munchmates.android.DatabaseObjs.User
+import kotlinx.android.synthetic.main.activity_conversation.*
 import kotlinx.android.synthetic.main.activity_list.*
+import java.text.SimpleDateFormat
+import java.util.*
 
-class ConversationActivity : AppCompatActivity() {
+class ConversationActivity : AppCompatActivity(), View.OnClickListener {
 
     val dialog = LoadingDialog(::respond)
     val usersRef = FirebaseDatabase.getInstance().reference
-    val users = arrayListOf<User>()
+    var them = User()
+    var you = User()
     val messages = arrayListOf<Message>()
     var done = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_list)
+        setContentView(R.layout.activity_conversation)
+        conv_button_send.setOnClickListener(this)
 
         var uid = intent.getStringExtra("uid")
         getMessages(uid)
@@ -47,17 +54,53 @@ class ConversationActivity : AppCompatActivity() {
             done = true
         }
         else {
-            users.add(snapshot.getValue<User>(User::class.java)!!)
+            val user = snapshot.getValue<User>(User::class.java)!!
+            if(user.uid == FirebaseAuth.getInstance().currentUser?.uid) {
+                you = user
+            }
+            else {
+                them = user
+            }
         }
 
-        if(done && users.size == 2) {
-            val adapter = MessagesAdapter(this, messages, users, intent.getStringExtra("uid"))
-            list_list_list.adapter = adapter
+        if(done && them != null && you != null) {
+            val adapter = MessagesAdapter(this, messages, you, them)
+            conv_list_msgs.adapter = adapter
             dialog.dismiss()
         }
     }
 
-    private class MessagesAdapter(private val context: Context, private val list: ArrayList<Message>, private val users: ArrayList<User>, private val me: String): BaseAdapter() {
+    override fun onClick(v: View?) {
+        when(v?.id) {
+            R.id.conv_button_send -> {
+                val message = conv_edit_msg.text.toString()
+                conv_edit_msg.setText("")
+                var newMsg =  Message("${you.firstName} ${you.lastName}", you.uid, message, SimpleDateFormat("M.d.yyyy • h:mma").format(Date()), System.currentTimeMillis() / 1000.0)
+                addMessage(newMsg, you, them)
+                addMessage(newMsg, them, you)
+            }
+        }
+    }
+
+    private fun addMessage(newMsg: Message, user: User, other: User) {
+        val uid = other.uid
+        val convos = user.conversations.messageList
+        if(!convos.keys.contains(uid)) {
+            convos[uid] = MsgObj()
+        }
+        val msgRef = usersRef.child("USERS/${user.uid}/conversations/messageList/$uid/messages/")
+        msgRef.push().setValue(newMsg)
+
+        var read = true
+        if(user == them) {
+            read = false
+        }
+        val contact = Sender(read, other.uid, "${other.firstName} ${other.lastName}", -(System.currentTimeMillis() / 1000.0))
+        val sendRef = usersRef.child("USERS/${user.uid}/conversations/senderList/$uid/")
+        sendRef.setValue(contact)
+    }
+
+    private class MessagesAdapter(private val context: Context, private val list: ArrayList<Message>, private val you: User, private val them: User): BaseAdapter() {
 
         private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -77,16 +120,17 @@ class ConversationActivity : AppCompatActivity() {
             val rowView = inflater.inflate(R.layout.item_message, parent, false)
 
             val message = list[pos]
-            rowView.findViewById<TextView>(R.id.msg_text_msg).setText(message.text)
-            rowView.findViewById<TextView>(R.id.msg_text_sender).setText("UID: ${message.sender_id}")
-            rowView.findViewById<TextView>(R.id.msg_text_date).setText(message.dateTime)
-            for(user in users) {
-                if(message.sender_id == user.uid) {
-                    rowView.findViewById<TextView>(R.id.msg_text_sender).setText("${user.firstName} ${user.lastName}")
-                }
-            }
+            rowView.findViewById<TextView>(R.id.msg_text_msg).text = message.text
+            rowView.findViewById<TextView>(R.id.msg_text_sender).text = "UID: ${message.sender_id}"
+            rowView.findViewById<TextView>(R.id.msg_text_date).text = message.dateTime
 
-            if(message.sender_id == me) {
+            var user = you
+            if(message.sender_id == them.uid) {
+                user = them
+            }
+            rowView.findViewById<TextView>(R.id.msg_text_sender).text = "${user.firstName} ${user.lastName}"
+
+            if(message.sender_id == you.uid) {
                 rowView.setBackgroundColor(Color.parseColor("#EEEEEE"))
             }
 

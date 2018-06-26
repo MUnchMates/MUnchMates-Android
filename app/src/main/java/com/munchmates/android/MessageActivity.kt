@@ -43,8 +43,15 @@ class MessageActivity : AppCompatActivity() {
         if(snapshot.ref.toString().contains("senderList")) {
             for(child in snapshot.children) {
                 val sender = child.getValue<Sender>(Sender::class.java)!!
+                print("Requesting ${sender.uid}")
                 usersRef.child("USERS/${sender.uid}").addValueEventListener(dialog)
                 senders.add(sender)
+            }
+            if(snapshot.childrenCount == 0L) {
+                val adapter = SenderAdapter(this, senders, users)
+                list_list_list.adapter = adapter
+                list_list_list.onItemClickListener = adapter
+                dialog.dismiss()
             }
         }
         else {
@@ -61,6 +68,9 @@ class MessageActivity : AppCompatActivity() {
     private class SenderAdapter(private val context: Context, private val senders: ArrayList<Sender>, private val users: ArrayList<User>): BaseAdapter(), AdapterView.OnItemClickListener {
 
         override fun onItemClick(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            FirebaseDatabase.getInstance().reference.child("USERS/$uid/conversations/senderList/$uid/read").setValue(true)
+
             val intent = Intent(context, ConversationActivity::class.java)
             intent.putExtra("uid", senders[pos].uid)
             context.startActivity(intent)
