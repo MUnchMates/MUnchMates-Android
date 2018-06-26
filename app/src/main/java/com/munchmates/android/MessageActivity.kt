@@ -16,7 +16,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.munchmates.android.DatabaseObjs.Sender
 import com.munchmates.android.DatabaseObjs.User
 import kotlinx.android.synthetic.main.activity_list.*
-import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.backgroundResource
 
 class MessageActivity : AppCompatActivity() {
@@ -29,6 +28,7 @@ class MessageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
+        list_list_list.clearChoices()
 
         getMessages()
     }
@@ -69,10 +69,11 @@ class MessageActivity : AppCompatActivity() {
 
         override fun onItemClick(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
             val uid = FirebaseAuth.getInstance().currentUser?.uid
-            FirebaseDatabase.getInstance().reference.child("USERS/$uid/conversations/senderList/$uid/read").setValue(true)
+            val senderId = senders[pos].uid
+            FirebaseDatabase.getInstance().reference.child("USERS/$uid/conversations/senderList/$senderId/read").setValue(true)
 
             val intent = Intent(context, ConversationActivity::class.java)
-            intent.putExtra("uid", senders[pos].uid)
+            intent.putExtra("uid", senderId)
             context.startActivity(intent)
         }
 

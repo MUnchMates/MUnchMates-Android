@@ -16,7 +16,6 @@ import com.munchmates.android.DatabaseObjs.MsgObj
 import com.munchmates.android.DatabaseObjs.Sender
 import com.munchmates.android.DatabaseObjs.User
 import kotlinx.android.synthetic.main.activity_conversation.*
-import kotlinx.android.synthetic.main.activity_list.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,6 +32,7 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversation)
         conv_button_send.setOnClickListener(this)
+        conv_list_msgs.clearChoices()
 
         var uid = intent.getStringExtra("uid")
         getMessages(uid)
