@@ -1,21 +1,20 @@
 package com.munchmates.android
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.BaseAdapter
 import android.widget.TextView
 import com.google.firebase.database.*
 import com.munchmates.android.DatabaseObjs.*
+import kotlinx.android.synthetic.main.activity_conversation.*
 import kotlinx.android.synthetic.main.activity_list.*
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : AppCompatActivity(), View.OnClickListener {
     val dialog = LoadingDialog(::respond)
+    var results = hashMapOf<String, View>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,48 +68,34 @@ class SearchActivity : AppCompatActivity() {
         }
 
         users.shuffle()
-        val adapter = UserAdapter(this, users)
-        list_list_list.adapter = adapter
-        list_list_list.onItemClickListener = adapter
+        results = hashMapOf()
+        list_list_list.removeAllViews()
+        for(user in users) {
+            val view = LayoutInflater.from(this).inflate(R.layout.item_search_result, list_list_list as ViewGroup, false)
+
+            view.findViewById<TextView>(R.id.result_text_name).text = "${user.firstName} ${user.lastName}"
+            view.findViewById<TextView>(R.id.result_text_college).text = "${user.college}"
+            view.findViewById<TextView>(R.id.result_text_class).text = "${user.mateType}"
+
+            if(user.mealPlan) {
+                view.findViewById<TextView>(R.id.result_text_m).visibility = View.VISIBLE
+            }
+            list_list_list.addView(view)
+            list_list_list.addView(LayoutInflater.from(this).inflate(R.layout.spacer, list_list_list as ViewGroup, false))
+            results.put(user.uid, view)
+            view.setOnClickListener(this)
+        }
 
         dialog.dismiss()
     }
 
-    private class UserAdapter(private val context: Context, private val list: ArrayList<User>): BaseAdapter(), AdapterView.OnItemClickListener {
-
-        override fun onItemClick(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
-            val intent = Intent(context, ProfileActivity::class.java)
-            intent.putExtra("uid", list[pos].uid)
-            context.startActivity(intent)
-        }
-
-        private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
-        override fun getCount(): Int {
-            return list.size
-        }
-
-        override fun getItem(position: Int): Any {
-            return list[position]
-        }
-
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
-        }
-
-        override fun getView(pos: Int, convertView: View?, parent: ViewGroup): View {
-            val rowView = inflater.inflate(R.layout.item_search_result, parent, false)
-
-            val user = list[pos]
-            rowView.findViewById<TextView>(R.id.result_text_name).setText("${user.firstName} ${user.lastName}")
-            rowView.findViewById<TextView>(R.id.result_text_college).setText("${user.college}")
-            rowView.findViewById<TextView>(R.id.result_text_class).setText("${user.mateType}")
-
-            if(user.mealPlan) {
-                rowView.findViewById<TextView>(R.id.result_text_m).visibility = View.VISIBLE
+    override fun onClick(v: View?) {
+        for(user in results.keys) {
+            if(results.getValue(user) == v) {
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.putExtra("uid", user)
+                startActivity(intent)
             }
-
-            return rowView
         }
     }
 }
