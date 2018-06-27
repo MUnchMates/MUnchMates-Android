@@ -19,9 +19,9 @@ class MessageActivity : AppCompatActivity(), View.OnClickListener {
 
     val dialog = LoadingDialog(::respond)
     val usersRef = FirebaseDatabase.getInstance().reference
-    val senders = arrayListOf<Sender>()
     val users = arrayListOf<User>()
     var results = hashMapOf<String, View>()
+    var senders = arrayListOf<Sender>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,26 +33,19 @@ class MessageActivity : AppCompatActivity(), View.OnClickListener {
     private fun getMessages() {
         dialog.show(fragmentManager.beginTransaction(), "dialog")
 
-        usersRef.child("USERS/${FirebaseAuth.getInstance().currentUser?.uid}/conversations/senderList").orderByChild("timeStamp").addValueEventListener(dialog)
+        for(sender in App.user.conversations.senderList.values) {
+            usersRef.child("USERS/${sender.uid}").addValueEventListener(dialog)
+            senders.add(sender)
+        }
+        if(senders.isEmpty()) {
+            fill()
+        }
     }
 
     private fun respond(snapshot: DataSnapshot) {
-        if(snapshot.ref.toString().contains("senderList")) {
-            for(child in snapshot.children) {
-                val sender = child.getValue<Sender>(Sender::class.java)!!
-                print("Requesting ${sender.uid}")
-                usersRef.child("USERS/${sender.uid}").addValueEventListener(dialog)
-                senders.add(sender)
-            }
-            if(snapshot.childrenCount == 0L) {
-                fill()
-            }
-        }
-        else {
-            users.add(snapshot.getValue<User>(User::class.java)!!)
-            if(users.size == senders.size) {
-                fill()
-            }
+        users.add(snapshot.getValue<User>(User::class.java)!!)
+        if(users.size == senders.size) {
+            fill()
         }
     }
 

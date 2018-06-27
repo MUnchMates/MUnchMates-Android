@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.google.firebase.database.*
 import com.munchmates.android.DatabaseObjs.*
-import kotlinx.android.synthetic.main.activity_conversation.*
 import kotlinx.android.synthetic.main.activity_list.*
 
 class SearchActivity : AppCompatActivity(), View.OnClickListener {

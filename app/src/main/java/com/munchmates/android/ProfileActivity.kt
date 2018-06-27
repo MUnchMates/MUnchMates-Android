@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.activity_profile.*
 
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     var uid = ""
-    val dialog = LoadingDialog(::respond)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,26 +30,15 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             profile_button_add.visibility = View.GONE
         }
         profile_button_add.setOnClickListener(this)
+    }
 
+    override fun onResume() {
+        super.onResume()
         fillPage()
     }
 
     private fun fillPage() {
-        dialog.show(fragmentManager.beginTransaction(), "dialog")
-
-        val userRef = FirebaseDatabase.getInstance().reference
-        userRef.child("USERS/$uid").addValueEventListener(dialog)
-
-        val storage = FirebaseStorage.getInstance()
-        val stoRef = storage.getReferenceFromUrl("gs://munch-mates-marquette.appspot.com/imgProfilePictures/").child("$uid.png")
-        Glide.with(this)
-                .load(stoRef)
-                .into(profile_image_avatar)
-    }
-
-    private fun respond(snapshot: DataSnapshot) {
-        val user = snapshot.getValue<User>(User::class.java)!!
-
+        val user = App.user
         profile_text_name.text = "${user.firstName} ${user.lastName}"
         if(user.city == "" || user.stateCountry == "") {
             profile_text_town.text = "${user.city}${user.stateCountry}"
@@ -64,17 +52,26 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         profile_text_type.text = " ${user.mateType}"
         profile_text_college.text = " ${user.college}"
 
+        profile_list_clubs.removeAllViews()
         for(club in user.clubsOrgs.values) {
             val view = LayoutInflater.from(this).inflate(R.layout.item_org_list, profile_list_clubs as ViewGroup, false) as TextView
             view.text = "- ${club.clubsOrgsName}"
             profile_list_clubs.addView(view)
         }
-        dialog.dismiss()
+
+        val storage = FirebaseStorage.getInstance()
+        val stoRef = storage.getReferenceFromUrl("gs://munch-mates-marquette.appspot.com/imgProfilePictures/").child("$uid.png")
+        Glide.with(this)
+                .load(stoRef)
+                .into(profile_image_avatar)
     }
 
     override fun onClick(v: View?) {
         when(v?.id) {
             R.id.profile_button_add -> {
+                val intent = Intent(this, ClubActivity::class.java)
+                intent.putExtra("uid", uid)
+                startActivity(intent)
             }
         }
     }

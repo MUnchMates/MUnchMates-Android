@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
+import com.munchmates.android.DatabaseObjs.MateType
 import com.munchmates.android.DatabaseObjs.User
 import kotlinx.android.synthetic.main.activity_settings.*
 import org.jetbrains.anko.toast
@@ -31,7 +32,6 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
     var user = User()
     val CODE = 7
     var newImage: Bitmap? = null
-    val dialog = LoadingDialog(::respond)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,32 +43,32 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
         settings_button_delacct.setOnClickListener(this)
         settings_button_helpdesk.setOnClickListener(this)
 
-        val gAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, App.mates)
+        val schools = arrayListOf<String>()
+        for (college in App.colleges) {
+            schools.add(college.collegeName)
+        }
+
+        val mates = arrayListOf<String>()
+        for (mate in App.mates) {
+            mates.add(mate.mateTypeName)
+        }
+
+        val gAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mates)
         gAdapter.setDropDownViewResource(R.layout.item_spinner)
         settings_spinner_type.adapter = gAdapter
 
-        val cAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, App.colleges)
+        val cAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, schools)
         cAdapter.setDropDownViewResource(R.layout.item_spinner)
         settings_spinner_school.adapter = cAdapter
+    }
 
+    override fun onResume() {
+        super.onResume()
         fillPage()
     }
 
     private fun fillPage() {
-        dialog.show(fragmentManager.beginTransaction(), "dialog")
-
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
-        usersRef = usersRef.child("USERS/$uid")
-        usersRef.addValueEventListener(dialog)
-
-        stoRef = stoRef.child("$uid.png")
-        Glide.with(this)
-                .load(stoRef)
-                .into(settings_image_head)
-    }
-
-    fun respond(snapshot: DataSnapshot) {
-        user = snapshot.getValue<User>(User::class.java)!!
+        user = App.user
 
         settings_edit_first.setText(user.firstName)
         settings_edit_last.setText(user.lastName)
@@ -79,7 +79,10 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
         settings_switch_meal.isChecked = user.mealPlan
         settings_switch_notif.isChecked = user.emailNotifications
 
-        dialog.dismiss()
+        stoRef = stoRef.child("${user.uid}.png")
+        Glide.with(this)
+                .load(stoRef)
+                .into(settings_image_head)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

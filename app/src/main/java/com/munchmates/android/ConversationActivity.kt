@@ -23,7 +23,6 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
     val dialog = LoadingDialog(::respond)
     val usersRef = FirebaseDatabase.getInstance().reference
     var them = User()
-    var you = User()
     val messages = arrayListOf<Message>()
     var done = false
 
@@ -41,51 +40,37 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
 
         dialog.show(fragmentManager.beginTransaction(), "dialog")
 
-        usersRef.child("USERS/${FirebaseAuth.getInstance().currentUser?.uid}/conversations/messageList/$uid/messages").orderByChild("timeStamp").addValueEventListener(dialog)
-        usersRef.child("USERS/${FirebaseAuth.getInstance().currentUser?.uid}").addValueEventListener(dialog)
+        for(message in App.user.conversations.messageList[uid]!!.messages.values) {
+            messages.add(message)
+        }
+
         usersRef.child("USERS/$uid").addValueEventListener(dialog)
     }
 
     private fun respond(snapshot: DataSnapshot) {
-        if(snapshot.ref.toString().contains("messages")) {
-            for(child in snapshot.children) {
-                messages.add(child.getValue<Message>(Message::class.java)!!)
+        them = snapshot.getValue<User>(User::class.java)!!
+
+        conv_list_msgs.removeAllViews()
+        for(msg in messages) {
+            val view = LayoutInflater.from(this).inflate(R.layout.item_message, conv_list_msgs as ViewGroup, false)
+
+            view.findViewById<TextView>(R.id.msg_text_msg).text = msg.text
+            view.findViewById<TextView>(R.id.msg_text_sender).text = "UID: ${msg.sender_id}"
+            view.findViewById<TextView>(R.id.msg_text_date).text = msg.dateTime
+
+            var user = App.user
+            if(msg.sender_id == them.uid) {
+                user = them
             }
-            done = true
+            view.findViewById<TextView>(R.id.msg_text_sender).text = "${user.firstName} ${user.lastName}"
+
+            if(msg.sender_id == App.user.uid) {
+                view.setBackgroundColor(Color.parseColor("#EEEEEE"))
+            }
+            conv_list_msgs.addView(view)
+            conv_list_msgs.addView(LayoutInflater.from(this).inflate(R.layout.spacer, conv_list_msgs as ViewGroup, false))
         }
-        else {
-            val user = snapshot.getValue<User>(User::class.java)!!
-            if(user.uid == FirebaseAuth.getInstance().currentUser?.uid) {
-                you = user
-            }
-            else {
-                them = user
-            }
-        }
-
-        if(done && them != null && you != null) {
-            conv_list_msgs.removeAllViews()
-            for(msg in messages) {
-                val view = LayoutInflater.from(this).inflate(R.layout.item_message, conv_list_msgs as ViewGroup, false)
-
-                view.findViewById<TextView>(R.id.msg_text_msg).text = msg.text
-                view.findViewById<TextView>(R.id.msg_text_sender).text = "UID: ${msg.sender_id}"
-                view.findViewById<TextView>(R.id.msg_text_date).text = msg.dateTime
-
-                var user = you
-                if(msg.sender_id == them.uid) {
-                    user = them
-                }
-                view.findViewById<TextView>(R.id.msg_text_sender).text = "${user.firstName} ${user.lastName}"
-
-                if(msg.sender_id == you.uid) {
-                    view.setBackgroundColor(Color.parseColor("#EEEEEE"))
-                }
-                conv_list_msgs.addView(view)
-                conv_list_msgs.addView(LayoutInflater.from(this).inflate(R.layout.spacer, conv_list_msgs as ViewGroup, false))
-            }
-            dialog.dismiss()
-        }
+        dialog.dismiss()
     }
 
     override fun onClick(v: View?) {
@@ -93,9 +78,9 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
             R.id.conv_button_send -> {
                 val message = conv_edit_msg.text.toString()
                 conv_edit_msg.setText("")
-                var newMsg =  Message("${you.firstName} ${you.lastName}", you.uid, message, SimpleDateFormat("M.d.yyyy • h:mma").format(Date()), System.currentTimeMillis() / 1000.0)
-                addMessage(newMsg, you, them)
-                addMessage(newMsg, them, you)
+                var newMsg =  Message("${App.user.firstName} ${App.user.lastName}", App.user.uid, message, SimpleDateFormat("M.d.yyyy • h:mma").format(Date()), System.currentTimeMillis() / 1000.0)
+                addMessage(newMsg, App.user, them)
+                addMessage(newMsg, them, App.user)
             }
         }
     }

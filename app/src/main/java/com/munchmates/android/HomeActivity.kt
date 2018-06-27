@@ -38,6 +38,22 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         println("User: $uid")
     }
 
+    override fun onResume() {
+        super.onResume()
+        var read = 0
+        for(sender in App.user.conversations.senderList.values) {
+            if(!sender.read) {
+                read++
+            }
+        }
+        if(read > 0) {
+            home_button_messages.text = "Messages ($read)"
+        }
+        else {
+            home_button_messages.text = "Messages"
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
         return true
@@ -60,16 +76,24 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         var names = arrayListOf<String>()
         when(home_spinner_type.selectedItemPosition) {
             0 -> { // club
-                names = App.clubs
+                for (club in App.clubs) {
+                    names.add(club.clubsOrgsName)
+                }
             }
             1 -> { // college
-                names = App.colleges
+                for (college in App.colleges) {
+                    names.add(college.collegeName)
+                }
             }
             2 -> { // mate type
-                names = App.mates
+                for (mate in App.mates) {
+                    names.add(mate.mateTypeName)
+                }
             }
             3 -> { //meal plan
-                names = App.plans
+                for (plan in App.plans) {
+                    names.add(plan.mealPlanName)
+                }
             }
         }
         val gAdapter = ArrayAdapter(this, R.layout.item_link, names)
