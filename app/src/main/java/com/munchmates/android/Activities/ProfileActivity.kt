@@ -1,4 +1,4 @@
-package com.munchmates.android
+package com.munchmates.android.Activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,17 +8,17 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
-import com.munchmates.android.DatabaseObjs.Sender
+import com.munchmates.android.App
 import com.munchmates.android.DatabaseObjs.User
-import kotlinx.android.synthetic.main.activity_list.*
+import com.munchmates.android.Firebase.LoadingDialog
+import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_profile.*
 
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     var uid = ""
+    val dialog = LoadingDialog(::respond)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,11 +34,24 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        fillPage()
+
+        if(uid == App.user.uid) {
+            fillPage(App.user)
+        }
+        else {
+            dialog.show(fragmentManager.beginTransaction(), "dialog")
+            val userRef = FirebaseDatabase.getInstance().reference
+            userRef.child("USERS/$uid").addValueEventListener(dialog)
+        }
     }
 
-    private fun fillPage() {
-        val user = App.user
+    fun respond(snapshot: DataSnapshot) {
+        val user = snapshot.getValue<User>(User::class.java)!!
+        fillPage(user)
+        dialog.dismiss()
+    }
+
+    private fun fillPage(user: User) {
         profile_text_name.text = "${user.firstName} ${user.lastName}"
         if(user.city == "" || user.stateCountry == "") {
             profile_text_town.text = "${user.city}${user.stateCountry}"

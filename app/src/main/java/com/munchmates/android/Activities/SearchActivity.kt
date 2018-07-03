@@ -1,4 +1,4 @@
-package com.munchmates.android
+package com.munchmates.android.Activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.google.firebase.database.*
 import com.munchmates.android.DatabaseObjs.*
+import com.munchmates.android.Firebase.LoadingDialog
+import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_list.*
 
 class SearchActivity : AppCompatActivity(), View.OnClickListener {

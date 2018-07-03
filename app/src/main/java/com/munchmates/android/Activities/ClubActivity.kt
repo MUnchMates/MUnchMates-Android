@@ -1,4 +1,4 @@
-package com.munchmates.android
+package com.munchmates.android.Activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -8,7 +8,9 @@ import android.widget.CompoundButton
 import android.widget.Switch
 import android.widget.TextView
 import com.google.firebase.database.FirebaseDatabase
+import com.munchmates.android.App
 import com.munchmates.android.DatabaseObjs.Club
+import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_list.*
 
 class ClubActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeListener {

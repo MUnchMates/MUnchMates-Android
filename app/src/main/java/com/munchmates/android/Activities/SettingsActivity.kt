@@ -1,4 +1,4 @@
-package com.munchmates.android
+package com.munchmates.android.Activities
 
 import android.app.Activity
 import android.content.Intent
@@ -8,19 +8,13 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import com.bumptech.glide.Glide
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
-import com.munchmates.android.DatabaseObjs.MateType
-import com.munchmates.android.DatabaseObjs.User
+import com.munchmates.android.App
+import com.munchmates.android.Prefs
+import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_settings.*
 import org.jetbrains.anko.toast
 import java.io.ByteArrayOutputStream
@@ -29,7 +23,6 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
 
     var usersRef = FirebaseDatabase.getInstance().reference
     var stoRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://munch-mates-marquette.appspot.com/imgProfilePictures/")
-    var user = User()
     val CODE = 7
     var newImage: Bitmap? = null
 
@@ -68,7 +61,7 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun fillPage() {
-        user = App.user
+        val user = App.user
 
         settings_edit_first.setText(user.firstName)
         settings_edit_last.setText(user.lastName)
@@ -120,6 +113,7 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), CODE)
             }
             R.id.settings_button_save -> {
+                val user = App.user
                 user.firstName = settings_edit_first.text.toString()
                 user.lastName = settings_edit_last.text.toString()
                 user.city = settings_edit_town.text.toString()
@@ -146,7 +140,7 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
                 startActivity(Intent.createChooser(intent, "Send helpdesk email..."))
             }
             R.id.settings_button_pwreset -> {
-                FirebaseAuth.getInstance().sendPasswordResetEmail(user.email).addOnCompleteListener(this) { task ->
+                FirebaseAuth.getInstance().sendPasswordResetEmail(App.user.email).addOnCompleteListener(this) { task ->
                     if(task.isSuccessful) {
                         toast("Password reset email sent")
                     }

@@ -1,4 +1,4 @@
-package com.munchmates.android
+package com.munchmates.android.Activities
 
 import android.graphics.Color
 import android.os.Bundle
@@ -7,14 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.munchmates.android.App
 import com.munchmates.android.DatabaseObjs.Message
 import com.munchmates.android.DatabaseObjs.MsgObj
 import com.munchmates.android.DatabaseObjs.Sender
 import com.munchmates.android.DatabaseObjs.User
+import com.munchmates.android.Firebase.LoadingDialog
+import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_conversation.*
-import kotlinx.android.synthetic.main.activity_list.*
 import java.text.SimpleDateFormat
 import java.util.*
 

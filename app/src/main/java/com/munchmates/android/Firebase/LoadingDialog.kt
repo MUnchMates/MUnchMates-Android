@@ -1,4 +1,4 @@
-package com.munchmates.android
+package com.munchmates.android.Firebase
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog

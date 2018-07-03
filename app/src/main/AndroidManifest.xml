@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".MMActivity"
+        <activity android:name=".Activities.MMActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,35 +19,35 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity"
+        <activity android:name=".Activities.LoginActivity"
             android:theme="@style/AppTheme">
         </activity>
 
-        <activity android:name=".HomeActivity"
+        <activity android:name=".Activities.HomeActivity"
             android:theme="@style/AppTheme">
         </activity>
 
-        <activity android:name=".ProfileActivity"
+        <activity android:name=".Activities.ProfileActivity"
             android:theme="@style/AppTheme">
         </activity>
 
-        <activity android:name=".SettingsActivity"
+        <activity android:name=".Activities.SettingsActivity"
             android:theme="@style/AppTheme">
         </activity>
 
-        <activity android:name=".SearchActivity"
+        <activity android:name=".Activities.SearchActivity"
             android:theme="@style/AppTheme">
         </activity>
 
-        <activity android:name=".MessageActivity"
+        <activity android:name=".Activities.MessageActivity"
             android:theme="@style/AppTheme">
         </activity>
 
-        <activity android:name=".ConversationActivity"
+        <activity android:name=".Activities.ConversationActivity"
             android:theme="@style/AppTheme">
         </activity>
 
-        <activity android:name=".ClubActivity"
+        <activity android:name=".Activities.ClubActivity"
             android:theme="@style/AppTheme">
         </activity>
     </application>

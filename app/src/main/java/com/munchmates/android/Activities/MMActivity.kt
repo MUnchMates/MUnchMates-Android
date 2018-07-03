@@ -1,9 +1,12 @@
-package com.munchmates.android
+package com.munchmates.android.Activities
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.google.firebase.auth.FirebaseAuth
+import com.munchmates.android.App
+import com.munchmates.android.Prefs
+import com.munchmates.android.R
 import org.jetbrains.anko.doAsync
 
 class MMActivity : AppCompatActivity() {
