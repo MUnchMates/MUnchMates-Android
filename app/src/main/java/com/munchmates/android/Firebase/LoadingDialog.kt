@@ -18,7 +18,7 @@ class LoadingDialog(private val respond: (snapshot: DataSnapshot) -> Unit): Dial
     }
 
     override fun onCancelled(error: DatabaseError) {
-        error("Cancelled!!!")
+        print(error.message)
     }
 
     var bar: ProgressBar? = null

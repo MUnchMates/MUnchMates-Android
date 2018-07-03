@@ -20,8 +20,6 @@ import org.jetbrains.anko.toast
 import java.io.ByteArrayOutputStream
 
 class SettingsActivity : AppCompatActivity(), View.OnClickListener {
-
-    var usersRef = FirebaseDatabase.getInstance().reference
     var stoRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://munch-mates-marquette.appspot.com/imgProfilePictures/")
     val CODE = 7
     var newImage: Bitmap? = null
@@ -123,6 +121,7 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
                 user.muteMode = settings_switch_mute.isChecked
                 user.mealPlan = settings_switch_meal.isChecked
                 user.emailNotifications = settings_switch_notif.isChecked
+                val usersRef = FirebaseDatabase.getInstance().reference.child("USERS/${user.uid}")
                 usersRef.setValue(user)
 
                 if(newImage != null) {

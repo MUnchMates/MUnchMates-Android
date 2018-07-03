@@ -24,35 +24,37 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
     val dialog = LoadingDialog(::respond)
     val usersRef = FirebaseDatabase.getInstance().reference
     var them = User()
-    val messages = arrayListOf<Message>()
-    var done = false
+    var messages = arrayListOf<Message>()
+    var uid = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversation)
         conv_button_send.setOnClickListener(this)
 
-        var uid = intent.getStringExtra("uid")
-        getMessages(uid)
+        uid = intent.getStringExtra("uid")
+        getMessages()
     }
 
-    private fun getMessages(uid: String) {
-        done = false
-
+    private fun getMessages() {
         dialog.show(fragmentManager.beginTransaction(), "dialog")
-
-        for(message in App.user.conversations.messageList[uid]!!.messages.values) {
-            messages.add(message)
-        }
+        listMessages()
 
         usersRef.child("USERS/$uid").addValueEventListener(dialog)
     }
 
-    private fun respond(snapshot: DataSnapshot) {
-        them = snapshot.getValue<User>(User::class.java)!!
+    private fun listMessages() {
+        messages = arrayListOf()
+        if (App.user.conversations.messageList.contains(uid)) {
+            for (message in App.user.conversations.messageList[uid]!!.messages.values) {
+                messages.add(message)
+            }
+        }
+    }
 
+    private fun buildList() {
         conv_list_msgs.removeAllViews()
-        for(msg in messages) {
+        for (msg in messages) {
             val view = LayoutInflater.from(this).inflate(R.layout.item_message, conv_list_msgs as ViewGroup, false)
 
             view.findViewById<TextView>(R.id.msg_text_msg).text = msg.text
@@ -60,17 +62,22 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
             view.findViewById<TextView>(R.id.msg_text_date).text = msg.dateTime
 
             var user = App.user
-            if(msg.sender_id == them.uid) {
+            if (msg.sender_id == them.uid) {
                 user = them
             }
             view.findViewById<TextView>(R.id.msg_text_sender).text = "${user.firstName} ${user.lastName}"
 
-            if(msg.sender_id == App.user.uid) {
+            if (msg.sender_id == App.user.uid) {
                 view.setBackgroundColor(Color.parseColor("#EEEEEE"))
             }
             conv_list_msgs.addView(view)
             conv_list_msgs.addView(LayoutInflater.from(this).inflate(R.layout.spacer, conv_list_msgs as ViewGroup, false))
         }
+    }
+
+    private fun respond(snapshot: DataSnapshot) {
+        them = snapshot.getValue<User>(User::class.java)!!
+        buildList()
         dialog.dismiss()
     }
 
