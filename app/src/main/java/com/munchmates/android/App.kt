@@ -1,6 +1,5 @@
 package com.munchmates.android
 
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -18,37 +17,42 @@ class App {
         var plans = arrayListOf<MPlanType>()
         var user = User()
 
-        fun init() {
-            FirebaseDatabase.getInstance().reference.child("LISTS/clubsOrgs").addValueEventListener(TypeListener())
-            FirebaseDatabase.getInstance().reference.child("LISTS/colleges").addValueEventListener(TypeListener())
-            FirebaseDatabase.getInstance().reference.child("LISTS/mateTypes").addValueEventListener(TypeListener())
-            FirebaseDatabase.getInstance().reference.child("LISTS/mealPlan").addValueEventListener(TypeListener())
-            FirebaseDatabase.getInstance().reference.child("USERS/${FirebaseAuth.getInstance().uid}").addValueEventListener(TypeListener())
+        fun init(uid: String) {
+            FirebaseDatabase.getInstance().reference.child("LISTS/clubsOrgs").addValueEventListener(listener)
+            FirebaseDatabase.getInstance().reference.child("LISTS/colleges").addValueEventListener(listener)
+            FirebaseDatabase.getInstance().reference.child("LISTS/mateTypes").addValueEventListener(listener)
+            FirebaseDatabase.getInstance().reference.child("LISTS/mealPlan").addValueEventListener(listener)
+            FirebaseDatabase.getInstance().reference.child("USERS/$uid").addValueEventListener(listener)
             while(current < 5);
         }
-    }
 
-    private class TypeListener: ValueEventListener {
+        private val listener = object : ValueEventListener {
 
-        override fun onDataChange(snapshot: DataSnapshot) {
-            if(snapshot.ref.toString().contains("clubsOrgs")) {
-                for(type in snapshot.children) clubs.add(type.getValue<Club>(Club::class.java)!!)
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val refStr = snapshot.ref.toString()
+                println("Loading $refStr")
+                if(refStr.contains("clubsOrgs")) {
+                    for(type in snapshot.children) clubs.add(type.getValue<Club>(Club::class.java)!!)
+                }
+                else if(refStr.contains("colleges")) {
+                    for(type in snapshot.children) colleges.add(type.getValue<CollegeType>(CollegeType::class.java)!!)
+                }
+                else if(refStr.contains("mateTypes")) {
+                    for(type in snapshot.children) mates.add(type.getValue<MateType>(MateType::class.java)!!)
+                }
+                else if(refStr.contains("mealPlan")) {
+                    for(type in snapshot.children) plans.add(type.getValue<MPlanType>(MPlanType::class.java)!!)
+                }
+                else if(refStr.contains("USERS")) {
+                    user = snapshot.getValue<User>(User::class.java)!!
+                }
+                current++
             }
-            if(snapshot.ref.toString().contains("colleges")) {
-                for(type in snapshot.children) colleges.add(type.getValue<CollegeType>(CollegeType::class.java)!!)
+
+            override fun onCancelled(error: DatabaseError) {
+                println(error.message)
+                current++
             }
-            if(snapshot.ref.toString().contains("mateTypes")) {
-                for(type in snapshot.children) mates.add(type.getValue<MateType>(MateType::class.java)!!)
-            }
-            if(snapshot.ref.toString().contains("mealPlan")) {
-                for(type in snapshot.children) plans.add(type.getValue<MPlanType>(MPlanType::class.java)!!)
-            }
-            if(snapshot.ref.toString().contains("USERS")) {
-                user = snapshot.getValue<User>(User::class.java)!!
-            }
-            current++
         }
-
-        override fun onCancelled(error: DatabaseError) {}
     }
 }

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.munchmates.android.App
 import com.munchmates.android.Prefs
 import com.munchmates.android.R
@@ -26,7 +27,7 @@ class MMActivity : AppCompatActivity() {
                 startActivity(Intent(c, LoginActivity::class.java))
             }
             else {
-                App.init()
+                App.init(FirebaseAuth.getInstance().currentUser!!.uid)
                 // enter app
                 startActivity(Intent(c, HomeActivity::class.java))
             }

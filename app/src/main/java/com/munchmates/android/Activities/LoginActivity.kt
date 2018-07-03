@@ -6,11 +6,15 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.FirebaseDatabase
 import com.munchmates.android.App
+import com.munchmates.android.DatabaseObjs.User
 import com.munchmates.android.Prefs
 import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.toast
+import java.text.SimpleDateFormat
+import java.util.*
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -37,13 +41,19 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         //Prefs.instance.put(Prefs.EMAIL_PREF, email)
         //Prefs.instance.put(Prefs.PASSWORD_PREF, password)
         if(email.isNotEmpty() && password.isNotEmpty()) {
-            when(v?.id) {
-                R.id.login_button_login -> {
-                    login(email, password)
+            if(email.endsWith("@marquette.edu", true) ||  email.endsWith("@mu.edu", true)) {
+                when (v?.id) {
+                    R.id.login_button_login -> {
+                        login(email, password)
+                    }
+                    R.id.login_button_create -> {
+                        createAccount(email, password)
+                    }
                 }
-                R.id.login_button_create -> {
-                    createAccount(email, password)
-                }
+            }
+            else {
+                login_text_error.text = "App requires a Marquette email address"
+                login_text_error.visibility = View.VISIBLE
             }
         }
         else {
@@ -63,6 +73,15 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         val auth = FirebaseAuth.getInstance()
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
             if(task.isSuccessful) {
+                val user = User()
+                user.uid = auth.uid!!
+                val names = email.split('@')[0].split('.')
+                user.firstName = names[0]
+                user.lastName = names.last()
+                user.email = email
+                user.searchOrderNumber = Random().nextInt((10000 + 1) - 1) + 1
+                user.lastOpened = SimpleDateFormat("M.d.yyyy • H:mm:ss").format(Date())
+                FirebaseDatabase.getInstance().reference.child("USERS/${auth.currentUser!!.uid}").setValue(user)
                 success(auth.currentUser!!)
             }
             else {
@@ -85,7 +104,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun success(user: FirebaseUser) {
         toast("Welcome ${user!!.email}!")
-        App.init()
+        App.init(user.uid)
         startActivity(Intent(this, HomeActivity::class.java))
     }
 
