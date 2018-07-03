@@ -15,6 +15,7 @@ import com.munchmates.android.DatabaseObjs.Sender
 import com.munchmates.android.DatabaseObjs.User
 import com.munchmates.android.Firebase.LoadingDialog
 import com.munchmates.android.R
+import com.munchmates.android.Utils
 import kotlinx.android.synthetic.main.activity_list.*
 import org.jetbrains.anko.backgroundResource
 
@@ -36,7 +37,8 @@ class MessageActivity : AppCompatActivity(), View.OnClickListener {
     private fun getMessages() {
         dialog.show(fragmentManager.beginTransaction(), "dialog")
 
-        for(sender in App.user.conversations.senderList.values) {
+        val sorted = Utils.sortSender(App.user.conversations.senderList)
+        for(sender in sorted) {
             usersRef.child("USERS/${sender.uid}").addValueEventListener(dialog)
             senders.add(sender)
         }

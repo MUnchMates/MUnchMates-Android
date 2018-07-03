@@ -15,9 +15,8 @@ import com.munchmates.android.DatabaseObjs.Sender
 import com.munchmates.android.DatabaseObjs.User
 import com.munchmates.android.Firebase.LoadingDialog
 import com.munchmates.android.R
+import com.munchmates.android.Utils
 import kotlinx.android.synthetic.main.activity_conversation.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 class ConversationActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -46,9 +45,7 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
     private fun listMessages() {
         messages = arrayListOf()
         if (App.user.conversations.messageList.contains(uid)) {
-            for (message in App.user.conversations.messageList[uid]!!.messages.values) {
-                messages.add(message)
-            }
+            messages = Utils.sortMessage(App.user.conversations.messageList[uid]!!.messages)
         }
     }
 
@@ -86,9 +83,11 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
             R.id.conv_button_send -> {
                 val message = conv_edit_msg.text.toString()
                 conv_edit_msg.setText("")
-                var newMsg =  Message("${App.user.firstName} ${App.user.lastName}", App.user.uid, message, SimpleDateFormat("M.d.yyyy • h:mma").format(Date()), System.currentTimeMillis() / 1000.0)
+                var newMsg =  Message("${App.user.firstName} ${App.user.lastName}", App.user.uid, message, Utils.getDate(Utils.messageFormat), System.currentTimeMillis() / 1000.0)
                 addMessage(newMsg, App.user, them)
                 addMessage(newMsg, them, App.user)
+                messages.add(newMsg)
+                buildList()
             }
         }
     }

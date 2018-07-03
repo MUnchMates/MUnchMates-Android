@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.munchmates.android.App
 import com.munchmates.android.R
+import com.munchmates.android.Utils
 import kotlinx.android.synthetic.main.activity_home.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -36,7 +37,7 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         //home_spinner_group.onItemSelectedListener = this
 
         val uid = FirebaseAuth.getInstance().currentUser!!.uid
-        FirebaseDatabase.getInstance().reference.child("USERS/$uid/lastOpened").setValue(SimpleDateFormat("M.d.yyyy • H:mm:ss").format(Date()))
+        FirebaseDatabase.getInstance().reference.child("USERS/$uid/lastOpened").setValue(Utils.getDate(Utils.userFormat))
         println("User: $uid")
     }
 
