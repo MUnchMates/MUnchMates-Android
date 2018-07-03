@@ -12,6 +12,7 @@ import com.munchmates.android.DatabaseObjs.User
 import com.munchmates.android.Prefs
 import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_login.*
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import java.text.SimpleDateFormat
 import java.util.*
@@ -104,8 +105,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun success(user: FirebaseUser) {
         toast("Welcome ${user!!.email}!")
-        App.init(user.uid)
-        startActivity(Intent(this, HomeActivity::class.java))
+        val c = this
+        doAsync {
+            App.init(user.uid)
+            startActivity(Intent(c, HomeActivity::class.java))
+        }
     }
 
     private fun failure(taskEx: Exception) {
