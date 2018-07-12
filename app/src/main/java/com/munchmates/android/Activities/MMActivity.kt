@@ -27,7 +27,7 @@ class MMActivity : AppCompatActivity() {
                 startActivity(Intent(c, LoginActivity::class.java))
             }
             else {
-                App.init(FirebaseAuth.getInstance().currentUser!!.uid)
+                App.init(FirebaseAuth.getInstance().currentUser!!.uid, c)
                 // enter app
                 startActivity(Intent(c, HomeActivity::class.java))
             }
