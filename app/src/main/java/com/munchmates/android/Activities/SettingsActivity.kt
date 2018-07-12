@@ -16,7 +16,10 @@ import com.munchmates.android.App
 import com.munchmates.android.Prefs
 import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_settings.*
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.noButton
 import org.jetbrains.anko.toast
+import org.jetbrains.anko.yesButton
 import java.io.ByteArrayOutputStream
 
 class SettingsActivity : AppCompatActivity(), View.OnClickListener {
@@ -97,12 +100,19 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
+        val c = this
         when(v?.id) {
             R.id.settings_button_logout -> {
-                Prefs.instance.put(Prefs.EMAIL_PREF, "")
-                Prefs.instance.put(Prefs.PASSWORD_PREF, "")
-                FirebaseAuth.getInstance().signOut()
-                startActivity(Intent(this, MMActivity::class.java))
+                alert("Logout current account?") {
+                    title = "Logout"
+                    positiveButton("Logout") {
+                        Prefs.instance.put(Prefs.EMAIL_PREF, "")
+                        Prefs.instance.put(Prefs.PASSWORD_PREF, "")
+                        FirebaseAuth.getInstance().signOut()
+                        startActivity(Intent(c, MMActivity::class.java))
+                    }
+                    negativeButton("Cancel") {}
+                }.show()
             }
             R.id.settings_text_head -> {
                 val intent = Intent(Intent.ACTION_GET_CONTENT)
@@ -139,26 +149,38 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
                 startActivity(Intent.createChooser(intent, "Send helpdesk email..."))
             }
             R.id.settings_button_pwreset -> {
-                FirebaseAuth.getInstance().sendPasswordResetEmail(App.user.email).addOnCompleteListener(this) { task ->
-                    if(task.isSuccessful) {
-                        toast("Password reset email sent")
+                alert("Send a password reset email?") {
+                    title = "Password Reset"
+                    positiveButton("SEND") {
+                        FirebaseAuth.getInstance().sendPasswordResetEmail(App.user.email).addOnCompleteListener(c) { task ->
+                            if(task.isSuccessful) {
+                                toast("Password reset email sent")
+                            }
+                            else {
+                                toast("Error sending password reset email")
+                            }
+                        }
                     }
-                    else {
-                        toast("Error sending password reset email")
-                    }
-                }
+                    negativeButton("Cancel") {}
+                }.show()
             }
             R.id.settings_button_delacct -> {
-                FirebaseAuth.getInstance().currentUser!!.delete().addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        toast("Account successfully deleted")
-                        Prefs.instance.put(Prefs.EMAIL_PREF, "")
-                        Prefs.instance.put(Prefs.PASSWORD_PREF, "")
-                        startActivity(Intent(this, MMActivity::class.java))
-                    } else {
-                        toast("Error deleting account")
+                alert("Delete you account?") {
+                    title = "Delete Account"
+                    positiveButton("Delete") {
+                        FirebaseAuth.getInstance().currentUser!!.delete().addOnCompleteListener(c) { task ->
+                            if (task.isSuccessful) {
+                                toast("Account successfully deleted")
+                                Prefs.instance.put(Prefs.EMAIL_PREF, "")
+                                Prefs.instance.put(Prefs.PASSWORD_PREF, "")
+                                startActivity(Intent(c, MMActivity::class.java))
+                            } else {
+                                toast("Error deleting account")
+                            }
+                        }
                     }
-                }
+                    negativeButton("Cancel") {}
+                }.show()
             }
         }
     }
