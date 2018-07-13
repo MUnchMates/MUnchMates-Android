@@ -6,6 +6,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import com.bumptech.glide.Glide
@@ -31,7 +33,6 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         settings_button_logout.setOnClickListener(this)
-        settings_button_save.setOnClickListener(this)
         settings_text_head.setOnClickListener(this)
         settings_button_pwreset.setOnClickListener(this)
         settings_button_delacct.setOnClickListener(this)
@@ -50,10 +51,12 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
         val gAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mates)
         gAdapter.setDropDownViewResource(R.layout.item_spinner)
         settings_spinner_type.adapter = gAdapter
+        settings_spinner_type.setSelection(mates.indexOf(App.user.mateType))
 
         val cAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, schools)
         cAdapter.setDropDownViewResource(R.layout.item_spinner)
         settings_spinner_school.adapter = cAdapter
+        settings_spinner_school.setSelection(schools.indexOf(App.user.college))
     }
 
     override fun onResume() {
@@ -120,27 +123,6 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
                 intent.setAction(Intent.ACTION_GET_CONTENT)
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), CODE)
             }
-            R.id.settings_button_save -> {
-                val user = App.user
-                user.firstName = settings_edit_first.text.toString()
-                user.lastName = settings_edit_last.text.toString()
-                user.city = settings_edit_town.text.toString()
-                user.stateCountry = settings_edit_state.text.toString()
-                user.mateType = settings_spinner_type.selectedItem as String
-                user.college = settings_spinner_school.selectedItem as String
-                user.muteMode = settings_switch_mute.isChecked
-                user.mealPlan = settings_switch_meal.isChecked
-                user.emailNotifications = settings_switch_notif.isChecked
-                val usersRef = FirebaseDatabase.getInstance().reference.child("USERS/${user.uid}")
-                usersRef.setValue(user)
-
-                if(newImage != null) {
-                    val stream = ByteArrayOutputStream()
-                    newImage!!.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-                    stoRef.putBytes(stream.toByteArray())
-                }
-                finish()
-            }
             R.id.settings_button_helpdesk -> {
                 intent = Intent(Intent.ACTION_SEND)
                 intent.setType("plain/text")
@@ -165,7 +147,7 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
                 }.show()
             }
             R.id.settings_button_delacct -> {
-                alert("Delete you account?") {
+                alert("Delete your account?") {
                     title = "Delete Account"
                     positiveButton("Delete") {
                         FirebaseAuth.getInstance().currentUser!!.delete().addOnCompleteListener(c) { task ->
@@ -182,6 +164,39 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
                     negativeButton("Cancel") {}
                 }.show()
             }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.settings, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.action_save -> {
+                val user = App.user
+                user.firstName = settings_edit_first.text.toString()
+                user.lastName = settings_edit_last.text.toString()
+                user.city = settings_edit_town.text.toString()
+                user.stateCountry = settings_edit_state.text.toString()
+                user.mateType = settings_spinner_type.selectedItem as String
+                user.college = settings_spinner_school.selectedItem as String
+                user.muteMode = settings_switch_mute.isChecked
+                user.mealPlan = settings_switch_meal.isChecked
+                user.emailNotifications = settings_switch_notif.isChecked
+                val usersRef = FirebaseDatabase.getInstance().reference.child("USERS/${user.uid}")
+                usersRef.setValue(user)
+
+                if(newImage != null) {
+                    val stream = ByteArrayOutputStream()
+                    newImage!!.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                    stoRef.putBytes(stream.toByteArray())
+                }
+                finish()
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
         }
     }
 }
