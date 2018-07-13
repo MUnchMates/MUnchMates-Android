@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
@@ -14,6 +15,7 @@ import com.munchmates.android.App
 import com.munchmates.android.DatabaseObjs.User
 import com.munchmates.android.Firebase.LoadingDialog
 import com.munchmates.android.R
+import kotlinx.android.synthetic.main.activity_list.*
 import kotlinx.android.synthetic.main.activity_profile.*
 
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
@@ -65,12 +67,20 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         profile_text_type.text = " ${user.mateType}"
         profile_text_college.text = " ${user.college}"
 
+        if(user.mealPlan) {
+            profile_text_mealplan.text = " unlimited"
+        }
+        else {
+            profile_text_mealplan.text = " none"
+        }
+
         profile_list_clubs.removeAllViews()
         for(club in user.clubsOrgs.values) {
-            val view = LayoutInflater.from(this).inflate(R.layout.item_org_list, profile_list_clubs as ViewGroup, false) as TextView
-            view.text = "- ${club.clubsOrgsName}"
+            val view = LayoutInflater.from(this).inflate(R.layout.item_org_list, profile_list_clubs as ViewGroup, false) as LinearLayout
+            view.findViewById<TextView>(R.id.club_text_name).text = "${club.clubsOrgsName}"
             profile_list_clubs.addView(view)
         }
+        profile_list_clubs.addView(LayoutInflater.from(this).inflate(R.layout.spacer, profile_list_clubs as ViewGroup, false))
 
         val storage = FirebaseStorage.getInstance()
         val stoRef = storage.getReferenceFromUrl("gs://munch-mates-marquette.appspot.com/imgProfilePictures/").child("$uid.png")
