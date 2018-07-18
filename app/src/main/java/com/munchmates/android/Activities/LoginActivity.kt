@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import com.munchmates.android.App
 import com.munchmates.android.DatabaseObjs.User
-import com.munchmates.android.Firebase.LoadingDialog
 import com.munchmates.android.Prefs
 import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_login.*

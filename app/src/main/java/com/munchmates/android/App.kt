@@ -4,10 +4,6 @@ import android.app.Activity
 import com.google.firebase.database.*
 import com.munchmates.android.DatabaseObjs.*
 import com.munchmates.android.Firebase.LoadingDialog
-import android.content.Context.NOTIFICATION_SERVICE
-import android.app.NotificationManager
-import android.support.v4.app.NotificationCompat
-
 
 class App {
 
@@ -28,7 +24,6 @@ class App {
             FirebaseDatabase.getInstance().reference.child("LISTS/mateTypes").addValueEventListener(dialog)
             FirebaseDatabase.getInstance().reference.child("LISTS/mealPlan").addValueEventListener(dialog)
             FirebaseDatabase.getInstance().reference.child("USERS/$uid").addValueEventListener(dialog)
-            notificationListen(uid, c)
             while(current < 5);
             dialog.dismiss()
         }
@@ -52,25 +47,6 @@ class App {
                 user = snapshot.getValue<User>(User::class.java)!!
             }
             current++
-        }
-
-        private fun notificationListen(uid: String, c: Activity) {
-            val builder = NotificationCompat.Builder(c)
-            val ref = FirebaseDatabase.getInstance().reference
-            ref.child("/USERS/$uid/conversations").addValueEventListener(object: ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    builder.setSmallIcon(R.mipmap.ic_launcher)
-                    builder.setContentTitle("Firebase Push Notification")
-                    builder.setContentText("Hello this is a test Firebase notification, a new database child has been added")
-                    val notificationManager = c.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                    notificationManager.notify(1, builder.build())
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    println("Error getting notification")
-                    println(error.message)
-                }
-            })
         }
     }
 }
