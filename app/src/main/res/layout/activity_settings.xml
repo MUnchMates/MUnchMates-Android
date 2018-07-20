@@ -42,7 +42,8 @@
             <ImageView
                 android:id="@+id/settings_image_head"
                 android:layout_width="128dp"
-                android:layout_height="128dp"/>
+                android:layout_height="128dp"
+                android:src="@drawable/default_head" />
 
             <TextView
                 android:id="@+id/settings_text_head"

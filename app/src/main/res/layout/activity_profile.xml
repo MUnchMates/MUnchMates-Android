@@ -19,7 +19,8 @@
             <ImageView
                 android:id="@+id/profile_image_avatar"
                 android:layout_width="128dp"
-                android:layout_height="128dp"/>
+                android:layout_height="128dp"
+                android:src="@drawable/default_head" />
 
             <LinearLayout
                 android:layout_width="0dp"

@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.app.DialogFragment
 import android.os.Bundle
+import android.view.MotionEvent
 import android.widget.ProgressBar
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -25,6 +26,8 @@ class LoadingDialog(private val respond: (snapshot: DataSnapshot) -> Unit): Dial
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         bar = ProgressBar(activity)
+
+        isCancelable = false
 
         val builder = AlertDialog.Builder(activity)
         builder.setView(bar)

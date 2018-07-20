@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
@@ -32,6 +34,15 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             login_edit_password.setText(password)
             login(email, password)
         }
+        checkGPS()
+    }
+
+    fun checkGPS() {
+        val gps = GoogleApiAvailability.getInstance()
+        val resultCode = gps.isGooglePlayServicesAvailable(this)
+        if(resultCode != ConnectionResult.SUCCESS) {
+            error("MUnchMates requires an up-to-date version of Google Play Services.")
+        }
     }
 
     override fun onClick(v: View?) {
@@ -48,7 +59,12 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                         login(email, password)
                     }
                     R.id.login_button_create -> {
-                        createAccount(email, password)
+                        if(password.length > 5) {
+                            createAccount(email, password)
+                        }
+                        else {
+                            error("Password must be at least 6 characters long.")
+                        }
                     }
                 }
             }
@@ -118,7 +134,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
         val ex = taskEx.toString()
         var userEx = ex.substring(ex.lastIndexOf(": ")+2)
-        login_text_error.text = userEx
+        error(userEx)
+    }
+
+    private fun error(error: String) {
+        login_text_error.text = error
         login_text_error.visibility = View.VISIBLE
     }
 }
