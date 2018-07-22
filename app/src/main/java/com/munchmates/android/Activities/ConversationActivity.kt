@@ -1,12 +1,12 @@
 package com.munchmates.android.Activities
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.munchmates.android.App
 import com.munchmates.android.DatabaseObjs.Message
@@ -25,6 +25,7 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
     var them = User()
     var messages = arrayListOf<Message>()
     var uid = ""
+    var name = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +33,8 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
         conv_button_send.setOnClickListener(this)
 
         uid = intent.getStringExtra("uid")
+        name = intent.getStringExtra("name")
+        title = name
         getMessages()
     }
 
@@ -108,5 +111,22 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
         val contact = Sender(read, other.uid, "${other.firstName} ${other.lastName}", -(System.currentTimeMillis() / 1000.0))
         val sendRef = usersRef.child("USERS/${user.uid}/conversations/senderList/$uid/")
         sendRef.setValue(contact)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.conversation, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.action_profile -> {
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.putExtra("uid", uid)
+                startActivity(intent)
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
     }
 }

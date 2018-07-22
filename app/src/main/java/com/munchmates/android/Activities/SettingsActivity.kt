@@ -38,6 +38,8 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
         settings_button_delacct.setOnClickListener(this)
         settings_button_helpdesk.setOnClickListener(this)
 
+        title = "Edit Profile"
+
         val schools = arrayListOf<String>()
         for (college in App.colleges) {
             schools.add(college.collegeName)

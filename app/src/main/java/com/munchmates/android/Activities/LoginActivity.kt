@@ -26,6 +26,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_login)
         login_button_login.setOnClickListener(this)
         login_button_create.setOnClickListener(this)
+        title = "MunchMates Login"
 
         val email = Prefs.instance.getStr(Prefs.EMAIL_PREF)
         val password = Prefs.instance.getStr(Prefs.PASSWORD_PREF)

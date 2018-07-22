@@ -25,6 +25,7 @@ class SearchActivity : AppCompatActivity(), View.OnClickListener {
         val type = intent.getIntExtra("type", 0)
         val group = intent.getStringExtra("group")
         println("Searching for a ${resources.getStringArray(R.array.groups)[type]} called $group")
+        title = "$group Mates"
 
         getResults(type, group)
     }

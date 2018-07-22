@@ -1,5 +1,6 @@
 package com.munchmates.android.Activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -15,12 +16,14 @@ import com.munchmates.android.App
 import com.munchmates.android.DatabaseObjs.User
 import com.munchmates.android.Firebase.LoadingDialog
 import com.munchmates.android.R
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_list.*
 import kotlinx.android.synthetic.main.activity_profile.*
 
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     var uid = ""
     val dialog = LoadingDialog(::respond)
+    var user = User()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +33,9 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         println("UID: $uid")
         if(uid != FirebaseAuth.getInstance().currentUser?.uid) {
             profile_button_add.visibility = View.GONE
+        }
+        else {
+            title = "Your Profile"
         }
         profile_button_add.setOnClickListener(this)
     }
@@ -47,8 +53,9 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun respond(snapshot: DataSnapshot) {
-        val user = snapshot.getValue<User>(User::class.java)!!
+    private fun respond(snapshot: DataSnapshot) {
+        user = snapshot.getValue<User>(User::class.java)!!
+        title = "${user.firstName} ${user.lastName}"
         fillPage(user)
         dialog.dismiss()
     }
@@ -78,6 +85,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         for(club in user.clubsOrgs.values) {
             val view = LayoutInflater.from(this).inflate(R.layout.item_org_list, profile_list_clubs as ViewGroup, false) as LinearLayout
             view.findViewById<TextView>(R.id.club_text_name).text = "${club.clubsOrgsName}"
+            view.setOnClickListener(ClubItem(club.clubsOrgsName, this))
             profile_list_clubs.addView(view)
         }
         profile_list_clubs.addView(LayoutInflater.from(this).inflate(R.layout.spacer, profile_list_clubs as ViewGroup, false))
@@ -118,10 +126,28 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             R.id.action_message -> {
                 val intent = Intent(this, ConversationActivity::class.java)
                 intent.putExtra("uid", uid)
+                intent.putExtra("name", "${user.firstName} ${user.lastName}")
                 startActivity(intent)
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
         }
+    }
+
+    class ClubItem: View.OnClickListener {
+        var name: String
+        var c: Activity
+
+        constructor(clubName: String, activity: Activity) {
+            name = clubName
+            c = activity
+        }
+        override fun onClick(v: View?) {
+            val intent = Intent(c, SearchActivity::class.java)
+            intent.putExtra("type", 0)
+            intent.putExtra("group", name)
+            c.startActivity(intent)
+        }
+
     }
 }

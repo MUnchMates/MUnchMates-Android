@@ -23,14 +23,14 @@ class MessageActivity : AppCompatActivity(), View.OnClickListener {
 
     val dialog = LoadingDialog(::respond)
     val usersRef = FirebaseDatabase.getInstance().reference
-    val users = arrayListOf<User>()
+    val users = hashMapOf<String, User>()
     var results = hashMapOf<String, View>()
     var senders = arrayListOf<Sender>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
-
+        title = "Messages"
         getMessages()
     }
 
@@ -48,7 +48,8 @@ class MessageActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun respond(snapshot: DataSnapshot) {
-        users.add(snapshot.getValue<User>(User::class.java)!!)
+        var user = snapshot.getValue<User>(User::class.java)!!
+        users[user.uid] = user
         if(users.size == senders.size) {
             fill()
         }
@@ -57,12 +58,11 @@ class MessageActivity : AppCompatActivity(), View.OnClickListener {
     private fun fill() {
         results = hashMapOf()
         list_list_list.removeAllViews()
-        for(i in 0 until senders.size) {
+        for(sender in senders) {
             println("Adding view")
-            val sender = senders[i]
             val view = LayoutInflater.from(this).inflate(R.layout.item_search_result, list_list_list as ViewGroup, false)
 
-            val user = users[i]
+            val user = users[sender.uid]!!
             view.findViewById<TextView>(R.id.result_text_name).text = sender.userDisplayName
             view.findViewById<TextView>(R.id.result_text_class).text = user.mateType
             view.findViewById<TextView>(R.id.result_text_college).text = user.college
@@ -90,6 +90,8 @@ class MessageActivity : AppCompatActivity(), View.OnClickListener {
 
                 val intent = Intent(this, ConversationActivity::class.java)
                 intent.putExtra("uid", senderId)
+                val user = users[senderId]!!
+                intent.putExtra("name", "${user.firstName} ${user.lastName}")
                 startActivity(intent)
             }
         }

@@ -19,7 +19,7 @@ class ClubActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeListener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
-
+        title = "Select Clubs"
         load()
     }
 
