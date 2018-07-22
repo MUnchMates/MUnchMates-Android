@@ -89,7 +89,7 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
         Glide.with(this)
                 .load(stoRef)
                 .apply(ops)
-                .into(profile_image_avatar)
+                .into(settings_image_head)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
