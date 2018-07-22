@@ -59,7 +59,6 @@ class MessageActivity : AppCompatActivity(), View.OnClickListener {
         results = hashMapOf()
         list_list_list.removeAllViews()
         for(sender in senders) {
-            println("Adding view")
             val view = LayoutInflater.from(this).inflate(R.layout.item_search_result, list_list_list as ViewGroup, false)
 
             val user = users[sender.uid]!!

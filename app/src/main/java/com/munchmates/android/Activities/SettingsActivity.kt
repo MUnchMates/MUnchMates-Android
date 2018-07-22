@@ -11,12 +11,14 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.munchmates.android.App
 import com.munchmates.android.Prefs
 import com.munchmates.android.R
+import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_settings.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
@@ -79,9 +81,15 @@ class SettingsActivity : AppCompatActivity(), View.OnClickListener {
         settings_switch_notif.isChecked = user.emailNotifications
 
         stoRef = stoRef.child("${user.uid}.png")
+
+        val ops = RequestOptions()
+                .placeholder(R.drawable.default_head)
+                .error(R.drawable.default_head)
+
         Glide.with(this)
                 .load(stoRef)
-                .into(settings_image_head)
+                .apply(ops)
+                .into(profile_image_avatar)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

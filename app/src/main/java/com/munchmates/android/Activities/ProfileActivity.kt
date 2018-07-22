@@ -2,12 +2,15 @@ package com.munchmates.android.Activities
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
@@ -92,8 +95,14 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
         val storage = FirebaseStorage.getInstance()
         val stoRef = storage.getReferenceFromUrl("gs://munch-mates-marquette.appspot.com/imgProfilePictures/").child("$uid.png")
+
+        val ops = RequestOptions()
+                .placeholder(R.drawable.default_head)
+                .error(R.drawable.default_head)
+
         Glide.with(this)
                 .load(stoRef)
+                .apply(ops)
                 .into(profile_image_avatar)
     }
 

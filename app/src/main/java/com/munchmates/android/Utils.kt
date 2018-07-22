@@ -12,18 +12,19 @@ class Utils {
         val userFormat = "M.d.yyyy • H:mm:ss"
 
         fun sortSender(senders: HashMap<String, Sender>): ArrayList<Sender> {
+            val unsorted = HashMap(senders)
             val sorted = arrayListOf<Sender>()
-            while(senders.size > 0) {
+            while(unsorted.size > 0) {
                 var lowest = ""
                 var timestamp = 0.0
-                for(sender in senders) {
+                for(sender in unsorted) {
                     if(sender.value.timeStamp < timestamp || lowest == "") {
                         timestamp = sender.value.timeStamp
                         lowest = sender.key
                     }
                 }
-                sorted.add(senders[lowest]!!)
-                senders.remove(lowest)
+                sorted.add(unsorted[lowest]!!)
+                unsorted.remove(lowest)
             }
             return sorted
         }
