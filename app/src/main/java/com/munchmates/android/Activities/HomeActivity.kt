@@ -76,7 +76,7 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         home_text_whatgroup.text = "Which ${resources.getStringArray(R.array.groups)[home_spinner_type.selectedItemPosition]}?"
-        var names = arrayListOf<String>()
+        val names = arrayListOf<String>()
         when(home_spinner_type.selectedItemPosition) {
             0 -> { // club
                 for (club in App.clubs) {

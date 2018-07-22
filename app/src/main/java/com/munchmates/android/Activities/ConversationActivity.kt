@@ -20,12 +20,10 @@ import kotlinx.android.synthetic.main.activity_conversation.*
 
 class ConversationActivity : AppCompatActivity(), View.OnClickListener {
 
-    val dialog = LoadingDialog(::respond)
     val usersRef = FirebaseDatabase.getInstance().reference
-    var them = User()
     var messages = arrayListOf<Message>()
     var uid = ""
-    var name = ""
+    var them = User()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,16 +31,8 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
         conv_button_send.setOnClickListener(this)
 
         uid = intent.getStringExtra("uid")
-        name = intent.getStringExtra("name")
-        title = name
-        getMessages()
-    }
-
-    private fun getMessages() {
-        dialog.show(fragmentManager.beginTransaction(), "dialog")
+        them = App.users[uid]!!
         listMessages()
-
-        usersRef.child("USERS/$uid").addValueEventListener(dialog)
     }
 
     private fun listMessages() {
@@ -50,6 +40,8 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
         if (App.user.conversations.messageList.contains(uid)) {
             messages = Utils.sortMessage(App.user.conversations.messageList[uid]!!.messages)
         }
+
+        buildList()
     }
 
     private fun buildList() {
@@ -62,7 +54,7 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
             view.findViewById<TextView>(R.id.msg_text_date).text = msg.dateTime
 
             var user = App.user
-            if (msg.sender_id == them.uid) {
+            if (msg.sender_id == uid) {
                 user = them
             }
             view.findViewById<TextView>(R.id.msg_text_sender).text = "${user.firstName} ${user.lastName}"
@@ -73,12 +65,6 @@ class ConversationActivity : AppCompatActivity(), View.OnClickListener {
             conv_list_msgs.addView(view)
             conv_list_msgs.addView(LayoutInflater.from(this).inflate(R.layout.spacer, conv_list_msgs as ViewGroup, false))
         }
-    }
-
-    private fun respond(snapshot: DataSnapshot) {
-        them = snapshot.getValue<User>(User::class.java)!!
-        buildList()
-        dialog.dismiss()
     }
 
     override fun onClick(v: View?) {

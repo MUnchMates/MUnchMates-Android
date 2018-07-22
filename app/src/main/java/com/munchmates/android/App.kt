@@ -14,7 +14,10 @@ class App {
         var colleges = arrayListOf<CollegeType>()
         var mates = arrayListOf<MateType>()
         var plans = arrayListOf<MPlanType>()
+        var users = hashMapOf<String, User>()
         var user = User()
+
+        var searches = hashMapOf<String, ArrayList<User>>()
 
         fun init(uid: String, c: Activity) {
             val dialog = LoadingDialog(::respond)
@@ -23,8 +26,9 @@ class App {
             FirebaseDatabase.getInstance().reference.child("LISTS/colleges").addValueEventListener(dialog)
             FirebaseDatabase.getInstance().reference.child("LISTS/mateTypes").addValueEventListener(dialog)
             FirebaseDatabase.getInstance().reference.child("LISTS/mealPlan").addValueEventListener(dialog)
-            FirebaseDatabase.getInstance().reference.child("USERS/$uid").addValueEventListener(dialog)
+            FirebaseDatabase.getInstance().reference.child("USERS/").addValueEventListener(dialog)
             while(current < 5);
+            user = users[uid]!!
             dialog.dismiss()
         }
 
@@ -44,7 +48,15 @@ class App {
                 for(type in snapshot.children) plans.add(type.getValue<MPlanType>(MPlanType::class.java)!!)
             }
             else if(refStr.contains("USERS")) {
-                user = snapshot.getValue<User>(User::class.java)!!
+                for(type in snapshot.children) {
+                    try {
+                        val user = type.getValue<User>(User::class.java)!!
+                        users[user.uid] = user
+                    } catch (e: DatabaseException) {
+                        println("Bad value on new user:")
+                        println(type.value)
+                    }
+                }
             }
             current++
         }

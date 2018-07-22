@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.google.firebase.database.*
+import com.munchmates.android.App
 import com.munchmates.android.DatabaseObjs.*
 import com.munchmates.android.Firebase.LoadingDialog
 import com.munchmates.android.R
@@ -17,26 +18,39 @@ import kotlinx.android.synthetic.main.activity_list.*
 class SearchActivity : AppCompatActivity(), View.OnClickListener {
     val dialog = LoadingDialog(::respond)
     var results = hashMapOf<String, View>()
+    var type = 0
+    var group = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
+        type = intent.getIntExtra("type", 0)
+        group = intent.getStringExtra("group")
 
-        val type = intent.getIntExtra("type", 0)
-        val group = intent.getStringExtra("group")
         println("Searching for a ${resources.getStringArray(R.array.groups)[type]} called $group")
         title = "$group Mates"
 
-        getResults(type, group)
+        dialog.show(fragmentManager.beginTransaction(), "dialog")
+        if(App.searches.containsKey("$type:$group")) {
+            displayResults(App.searches["$type:$group"]!!)
+        }
+        else {
+            getResults(type, group)
+        }
     }
 
     private fun getResults(type: Int, group: String) {
-        dialog.show(fragmentManager.beginTransaction(), "dialog")
-
         val usersRef = FirebaseDatabase.getInstance().reference.child("USERS")
         when(type) {
             0 -> { // club
-                usersRef.addValueEventListener(dialog)
+                val users = arrayListOf<User>()
+                for (user in App.users.values) {
+                    for (club in user.clubsOrgs.values) {
+                        if (club.clubsOrgsName == intent.getStringExtra("group")) users.add(user)
+                    }
+                }
+                App.searches["$type:$group"] = users
+                displayResults(users)
             }
             1 -> { // college
                 usersRef.orderByChild("college").equalTo(group).addValueEventListener(dialog)
@@ -50,18 +64,14 @@ class SearchActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun respond(snapshot: DataSnapshot) {
+    private fun respond(snapshot: DataSnapshot) {
         val users = arrayListOf<User>()
         println("Number of results ${snapshot.childrenCount}")
-        for(user in snapshot.children) {
+        for (user in snapshot.children) {
             try {
                 val user = user.getValue<User>(User::class.java)!!
-                if(intent.getIntExtra("type", 0) == 0) {
-                    for(club in user.clubsOrgs.values) {
-                        if(club.clubsOrgsName == intent.getStringExtra("group")) users.add(user)
-                    }
-                }
-                else {
+                if (intent.getIntExtra("type", 0) == 0) {
+                } else {
                     users.add(user)
                 }
             } catch (e: DatabaseException) {
@@ -69,7 +79,11 @@ class SearchActivity : AppCompatActivity(), View.OnClickListener {
                 println(user.value)
             }
         }
+        App.searches["$type:$group"] = users
+        displayResults(users)
+    }
 
+    private fun displayResults(users: ArrayList<User>) {
         users.shuffle()
         results = hashMapOf()
         list_list_list.removeAllViews()
@@ -85,7 +99,7 @@ class SearchActivity : AppCompatActivity(), View.OnClickListener {
             }
             list_list_list.addView(view)
             list_list_list.addView(LayoutInflater.from(this).inflate(R.layout.spacer, list_list_list as ViewGroup, false))
-            results.put(user.uid, view)
+            results[user.uid] = view
             view.setOnClickListener(this)
         }
 

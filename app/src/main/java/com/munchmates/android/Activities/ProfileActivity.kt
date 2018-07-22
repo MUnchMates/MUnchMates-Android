@@ -25,45 +25,35 @@ import kotlinx.android.synthetic.main.activity_profile.*
 
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     var uid = ""
-    val dialog = LoadingDialog(::respond)
     var user = User()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+        profile_button_add.setOnClickListener(this)
 
         uid = intent.getStringExtra("uid")
+        user = App.users[uid]!!
         println("UID: $uid")
+
         if(uid != FirebaseAuth.getInstance().currentUser?.uid) {
             profile_button_add.visibility = View.GONE
+            title = "${user.firstName} ${user.lastName}"
         }
         else {
             title = "Your Profile"
         }
-        profile_button_add.setOnClickListener(this)
+
+        fillPage()
     }
 
     override fun onResume() {
         super.onResume()
 
-        if(uid == App.user.uid) {
-            fillPage(App.user)
-        }
-        else {
-            dialog.show(fragmentManager.beginTransaction(), "dialog")
-            val userRef = FirebaseDatabase.getInstance().reference
-            userRef.child("USERS/$uid").addValueEventListener(dialog)
-        }
+        //fillPage(App.users[uid]!!)
     }
 
-    private fun respond(snapshot: DataSnapshot) {
-        user = snapshot.getValue<User>(User::class.java)!!
-        title = "${user.firstName} ${user.lastName}"
-        fillPage(user)
-        dialog.dismiss()
-    }
-
-    private fun fillPage(user: User) {
+    private fun fillPage() {
         profile_text_name.text = "${user.firstName} ${user.lastName}"
         if(user.city == "" || user.stateCountry == "") {
             profile_text_town.text = "${user.city}${user.stateCountry}"
