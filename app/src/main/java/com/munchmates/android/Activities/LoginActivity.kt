@@ -26,6 +26,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_login)
         login_button_login.setOnClickListener(this)
         login_button_create.setOnClickListener(this)
+        login_button_forgot.setOnClickListener(this)
         title = "MunchMates Login"
 
         val email = Prefs.instance.getStr(Prefs.EMAIL_PREF)
@@ -53,7 +54,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         // manual remember me
         //Prefs.instance.put(Prefs.EMAIL_PREF, email)
         //Prefs.instance.put(Prefs.PASSWORD_PREF, password)
-        if(email.isNotEmpty() && password.isNotEmpty()) {
+        if(email.isNotEmpty() && (password.isNotEmpty() || v?.id == R.id.login_button_forgot)) {
             if(email.endsWith("@marquette.edu", true) ||  email.endsWith("@mu.edu", true)) {
                 when (v?.id) {
                     R.id.login_button_login -> {
@@ -67,16 +68,18 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                             error("Password must be at least 6 characters long.")
                         }
                     }
+                    R.id.login_button_forgot -> {
+                        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                        error("Password reset requested.")
+                    }
                 }
             }
             else {
-                login_text_error.text = "App requires a Marquette email address"
-                login_text_error.visibility = View.VISIBLE
+                error("App requires a Marquette email address.")
             }
         }
         else {
-            login_text_error.text = "No username or password provided."
-            login_text_error.visibility = View.VISIBLE
+            error("No username or password provided.")
         }
     }
 
@@ -100,6 +103,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                 user.searchOrderNumber = Random().nextInt((10000 + 1) - 1) + 1
                 user.lastOpened = SimpleDateFormat("M.d.yyyy • H:mm:ss").format(Date())
                 FirebaseDatabase.getInstance().reference.child("USERS/${auth.currentUser!!.uid}").setValue(user)
+                FirebaseAuth.getInstance().currentUser!!.sendEmailVerification()
                 success(auth.currentUser!!)
             }
             else {
