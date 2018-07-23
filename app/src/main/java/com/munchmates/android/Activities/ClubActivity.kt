@@ -13,7 +13,7 @@ import com.munchmates.android.DatabaseObjs.Club
 import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_list.*
 
-class ClubActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeListener {
+class ClubActivity : BaseMMActivity(), CompoundButton.OnCheckedChangeListener {
     val results = hashMapOf<Club, Switch>()
 
     override fun onCreate(savedInstanceState: Bundle?) {

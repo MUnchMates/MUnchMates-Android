@@ -18,7 +18,7 @@ import com.munchmates.android.R
 import com.munchmates.android.Utils
 import kotlinx.android.synthetic.main.activity_conversation.*
 
-class ConversationActivity : AppCompatActivity(), View.OnClickListener {
+class ConversationActivity : BaseMMActivity(), View.OnClickListener {
 
     val usersRef = FirebaseDatabase.getInstance().reference
     var messages = arrayListOf<Message>()

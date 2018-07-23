@@ -2,9 +2,7 @@ package com.munchmates.android.Activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -15,7 +13,7 @@ import com.munchmates.android.Firebase.LoadingDialog
 import com.munchmates.android.R
 import kotlinx.android.synthetic.main.activity_list.*
 
-class SearchActivity : AppCompatActivity(), View.OnClickListener {
+class SearchActivity : BaseMMActivity(), View.OnClickListener {
     val dialog = LoadingDialog(::respond)
     var results = hashMapOf<String, View>()
     var type = 0

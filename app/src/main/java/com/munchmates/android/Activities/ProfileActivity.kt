@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_list.*
 import kotlinx.android.synthetic.main.activity_profile.*
 
-class ProfileActivity : AppCompatActivity(), View.OnClickListener {
+class ProfileActivity : BaseMMActivity(), View.OnClickListener {
     var uid = ""
     var user = User()
 

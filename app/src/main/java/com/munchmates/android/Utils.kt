@@ -30,18 +30,19 @@ class Utils {
         }
 
         fun sortMessage(messages: HashMap<String, Message>): ArrayList<Message> {
+            val unsorted = HashMap(messages)
             val sorted = arrayListOf<Message>()
-            while(messages.size > 0) {
+            while(unsorted.size > 0) {
                 var lowest = ""
                 var timestamp = 0.0
-                for(message in messages) {
+                for(message in unsorted) {
                     if(message.value.timeStamp < timestamp || lowest == "") {
                         timestamp = message.value.timeStamp
                         lowest = message.key
                     }
                 }
-                sorted.add(messages[lowest]!!)
-                messages.remove(lowest)
+                sorted.add(unsorted[lowest]!!)
+                unsorted.remove(lowest)
             }
             return sorted
         }

@@ -26,7 +26,7 @@ import org.jetbrains.anko.toast
 import org.jetbrains.anko.yesButton
 import java.io.ByteArrayOutputStream
 
-class SettingsActivity : AppCompatActivity(), View.OnClickListener {
+class SettingsActivity : BaseMMActivity(), View.OnClickListener {
     var stoRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://munch-mates-marquette.appspot.com/imgProfilePictures/")
     val CODE = 7
     var newImage: Bitmap? = null

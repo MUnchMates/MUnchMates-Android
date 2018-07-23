@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class HomeActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
+class HomeActivity : BaseMMActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

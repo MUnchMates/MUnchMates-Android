@@ -19,9 +19,7 @@ import com.munchmates.android.Utils
 import kotlinx.android.synthetic.main.activity_list.*
 import org.jetbrains.anko.backgroundResource
 
-class MessageActivity : AppCompatActivity(), View.OnClickListener {
-
-    val usersRef = FirebaseDatabase.getInstance().reference
+class MessageActivity : BaseMMActivity(), View.OnClickListener {
     var results = hashMapOf<String, View>()
     var senders = arrayListOf<Sender>()
 

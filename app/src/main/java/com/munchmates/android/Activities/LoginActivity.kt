@@ -19,7 +19,7 @@ import org.jetbrains.anko.toast
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LoginActivity : AppCompatActivity(), View.OnClickListener {
+class LoginActivity : BaseMMActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
