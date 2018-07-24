@@ -47,19 +47,13 @@ class ProfileActivity : BaseMMActivity(), View.OnClickListener {
         fillPage()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        //fillPage(App.users[uid]!!)
-    }
-
     private fun fillPage() {
         profile_text_name.text = "${user.firstName} ${user.lastName}"
-        if(user.city == "" || user.stateCountry == "") {
-            profile_text_town.text = "${user.city}${user.stateCountry}"
-        }
-        if(user.city == "" && user.stateCountry == "") {
+        if(user.city.isEmpty() && user.stateCountry.isEmpty()) {
             profile_text_town.visibility = View.GONE
+        }
+        else if(user.city.isEmpty() || user.stateCountry.isEmpty()) {
+            profile_text_town.text = "${user.city}${user.stateCountry}"
         }
         else {
             profile_text_town.text = "${user.city}, ${user.stateCountry}"
@@ -68,10 +62,10 @@ class ProfileActivity : BaseMMActivity(), View.OnClickListener {
         profile_text_college.text = " ${user.college}"
 
         if(user.mealPlan) {
-            profile_text_mealplan.text = " unlimited"
+            profile_text_mealplan.text = " Unlimited"
         }
         else {
-            profile_text_mealplan.text = " none"
+            profile_text_mealplan.text = " None"
         }
 
         profile_list_clubs.removeAllViews()

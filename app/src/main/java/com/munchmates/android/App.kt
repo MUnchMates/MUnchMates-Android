@@ -33,6 +33,7 @@ class App {
         }
 
         private fun respond(snapshot: DataSnapshot) {
+            println("Fetching data")
             val refStr = snapshot.ref.toString()
             println("Loading $refStr")
             if(refStr.contains("clubsOrgs")) {

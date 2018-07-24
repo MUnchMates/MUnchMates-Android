@@ -13,13 +13,14 @@ import com.munchmates.android.App
 import com.munchmates.android.DatabaseObjs.User
 import com.munchmates.android.Prefs
 import com.munchmates.android.R
+import com.munchmates.android.Utils
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LoginActivity : BaseMMActivity(), View.OnClickListener {
+class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,14 +98,16 @@ class LoginActivity : BaseMMActivity(), View.OnClickListener {
                 val user = User()
                 user.uid = auth.uid!!
                 val names = email.split('@')[0].split('.')
-                user.firstName = names[0]
-                user.lastName = names.last()
+                user.firstName = names[0].substring(0, 1).toUpperCase() + names[0].substring(1).toLowerCase()
+                user.lastName = names.last().substring(0, 1).toUpperCase() + names.last().substring(1).toLowerCase()
                 user.email = email
+                user.college = "No College Affiliation"
+                user.mateType = "Other"
                 user.searchOrderNumber = Random().nextInt((10000 + 1) - 1) + 1
-                user.lastOpened = SimpleDateFormat("M.d.yyyy • H:mm:ss").format(Date())
+                user.lastOpened = Utils.getDate(Utils.userFormat)
                 FirebaseDatabase.getInstance().reference.child("USERS/${auth.currentUser!!.uid}").setValue(user)
                 FirebaseAuth.getInstance().currentUser!!.sendEmailVerification()
-                success(auth.currentUser!!)
+                success(auth.currentUser!!, true)
             }
             else {
                 failure(task.exception!!)
@@ -116,7 +119,7 @@ class LoginActivity : BaseMMActivity(), View.OnClickListener {
         val auth = FirebaseAuth.getInstance()
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
             if(task.isSuccessful) {
-                success(auth.currentUser!!)
+                success(auth.currentUser!!, false)
             }
             else {
                 failure(task.exception!!)
@@ -124,12 +127,19 @@ class LoginActivity : BaseMMActivity(), View.OnClickListener {
         }
     }
 
-    private fun success(user: FirebaseUser) {
+    private fun success(user: FirebaseUser, newAcct: Boolean) {
         toast("Welcome ${user!!.email}!")
         val c = this
         doAsync {
             App.init(user.uid, c)
-            startActivity(Intent(c, HomeActivity::class.java))
+            if(newAcct) {
+                val intent = Intent(c, SettingsActivity::class.java)
+                intent.putExtra("new", true)
+                startActivity(intent)
+            }
+            else {
+                startActivity(Intent(c, HomeActivity::class.java))
+            }
         }
     }
 

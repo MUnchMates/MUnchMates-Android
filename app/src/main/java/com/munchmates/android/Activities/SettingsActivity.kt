@@ -30,6 +30,7 @@ class SettingsActivity : BaseMMActivity(), View.OnClickListener {
     var stoRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://munch-mates-marquette.appspot.com/imgProfilePictures/")
     val CODE = 7
     var newImage: Bitmap? = null
+    var newAcct = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +41,15 @@ class SettingsActivity : BaseMMActivity(), View.OnClickListener {
         settings_button_delacct.setOnClickListener(this)
         settings_button_helpdesk.setOnClickListener(this)
 
-        title = "Edit Profile"
+        newAcct = intent.getBooleanExtra("new", false)
+        if(newAcct) {
+            title = "Complete Your Profile"
+            settings_buttons_top.visibility = View.GONE
+            settings_buttons_bottom.visibility = View.GONE
+        }
+        else {
+            title = "Edit Profile"
+        }
 
         val schools = arrayListOf<String>()
         for (college in App.colleges) {
@@ -203,10 +212,25 @@ class SettingsActivity : BaseMMActivity(), View.OnClickListener {
                     newImage!!.compress(Bitmap.CompressFormat.JPEG, 100, stream)
                     stoRef.putBytes(stream.toByteArray())
                 }
-                finish()
+
+                if(newAcct) {
+                    startActivity(Intent(this, HomeActivity::class.java))
+                }
+                else {
+                    finish()
+                }
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onBackPressed() {
+        if(newAcct) {
+            startActivity(Intent(this, HomeActivity::class.java))
+        }
+        else {
+            super.onBackPressed()
         }
     }
 }
