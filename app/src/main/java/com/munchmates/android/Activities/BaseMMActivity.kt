@@ -9,7 +9,7 @@ abstract class BaseMMActivity: AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        if(App.users.size == 0) {
+        if(App.plans.isEmpty()) {
             val intent = Intent(this, MMActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)

@@ -14,5 +14,6 @@ data class User (
         var mealPlan: Boolean = false,
         var searchOrderNumber: Int = 0,
         var lastOpened: String = "",
+        var instanceId: String = "",
         var clubsOrgs: HashMap<String, Club> = hashMapOf(),
         var conversations: Conversation = Conversation())

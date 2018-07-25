@@ -51,6 +51,12 @@
             android:theme="@style/AppTheme">
         </activity>
 
+        <service android:name=".Firebase.PushNotificationService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

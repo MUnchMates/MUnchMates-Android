@@ -17,8 +17,7 @@ import com.munchmates.android.Utils
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
-import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Random
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
 

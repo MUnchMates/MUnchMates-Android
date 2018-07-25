@@ -1,7 +1,10 @@
 package com.munchmates.android
 
 import android.app.Activity
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.iid.FirebaseInstanceId
 import com.munchmates.android.DatabaseObjs.*
 import com.munchmates.android.Firebase.LoadingDialog
 
@@ -26,9 +29,23 @@ class App {
             FirebaseDatabase.getInstance().reference.child("LISTS/colleges").addValueEventListener(dialog)
             FirebaseDatabase.getInstance().reference.child("LISTS/mateTypes").addValueEventListener(dialog)
             FirebaseDatabase.getInstance().reference.child("LISTS/mealPlan").addValueEventListener(dialog)
-            FirebaseDatabase.getInstance().reference.child("USERS/").addValueEventListener(dialog)
-            while(current < 5);
-            user = users[uid]!!
+            FirebaseDatabase.getInstance().reference.child("USERS/$uid").addValueEventListener(dialog)
+            FirebaseDatabase.getInstance().reference.child("USERS/").addListenerForSingleValueEvent(dialog)
+            while(current < 6);
+            FirebaseInstanceId.getInstance().instanceId
+                    .addOnCompleteListener(OnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            println("getInstanceId failed $task.exception")
+                            return@OnCompleteListener
+                        }
+
+                        // Get new Instance ID token
+                        val token = task.result.token
+                        println("New token: $token")
+
+                        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+                        FirebaseDatabase.getInstance().reference.child("USERS/$uid/instanceId").setValue(token)
+                    })
             dialog.dismiss()
         }
 
@@ -48,7 +65,7 @@ class App {
             else if(refStr.contains("mealPlan")) {
                 for(type in snapshot.children) plans.add(type.getValue<MPlanType>(MPlanType::class.java)!!)
             }
-            else if(refStr.contains("USERS")) {
+            else if(refStr.endsWith("USERS")) {
                 for(type in snapshot.children) {
                     try {
                         val user = type.getValue<User>(User::class.java)!!
@@ -58,6 +75,9 @@ class App {
                         println(type.value)
                     }
                 }
+            }
+            else if(refStr.contains("USERS")) {
+                user = snapshot.getValue<User>(User::class.java)!!
             }
             current++
         }
