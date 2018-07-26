@@ -25,10 +25,10 @@ class App {
         fun init(uid: String, c: Activity) {
             val dialog = LoadingDialog(::respond)
             dialog.show(c.fragmentManager.beginTransaction(), "dialog")
-            FirebaseDatabase.getInstance().reference.child("LISTS/clubsOrgs").addValueEventListener(dialog)
-            FirebaseDatabase.getInstance().reference.child("LISTS/colleges").addValueEventListener(dialog)
-            FirebaseDatabase.getInstance().reference.child("LISTS/mateTypes").addValueEventListener(dialog)
-            FirebaseDatabase.getInstance().reference.child("LISTS/mealPlan").addValueEventListener(dialog)
+            FirebaseDatabase.getInstance().reference.child("LISTS/clubsOrgs").addListenerForSingleValueEvent(dialog)
+            FirebaseDatabase.getInstance().reference.child("LISTS/colleges").addListenerForSingleValueEvent(dialog)
+            FirebaseDatabase.getInstance().reference.child("LISTS/mateTypes").addListenerForSingleValueEvent(dialog)
+            FirebaseDatabase.getInstance().reference.child("LISTS/mealPlan").addListenerForSingleValueEvent(dialog)
             FirebaseDatabase.getInstance().reference.child("USERS/$uid").addValueEventListener(dialog)
             FirebaseDatabase.getInstance().reference.child("USERS/").addListenerForSingleValueEvent(dialog)
             while(current < 6);
@@ -54,18 +54,23 @@ class App {
             val refStr = snapshot.ref.toString()
             println("Loading $refStr")
             if(refStr.contains("clubsOrgs")) {
+                clubs = arrayListOf()
                 for(type in snapshot.children) clubs.add(type.getValue<Club>(Club::class.java)!!)
             }
             else if(refStr.contains("colleges")) {
+                colleges = arrayListOf()
                 for(type in snapshot.children) colleges.add(type.getValue<CollegeType>(CollegeType::class.java)!!)
             }
             else if(refStr.contains("mateTypes")) {
+                mates = arrayListOf()
                 for(type in snapshot.children) mates.add(type.getValue<MateType>(MateType::class.java)!!)
             }
             else if(refStr.contains("mealPlan")) {
+                plans = arrayListOf()
                 for(type in snapshot.children) plans.add(type.getValue<MPlanType>(MPlanType::class.java)!!)
             }
             else if(refStr.endsWith("USERS")) {
+                users = hashMapOf()
                 for(type in snapshot.children) {
                     try {
                         val user = type.getValue<User>(User::class.java)!!
