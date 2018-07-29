@@ -1,13 +1,13 @@
 package com.munchmates.android.Activities
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.TextView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.munchmates.android.App
 import com.munchmates.android.DatabaseObjs.Message
@@ -17,13 +17,17 @@ import com.munchmates.android.DatabaseObjs.User
 import com.munchmates.android.R
 import com.munchmates.android.Utils
 import kotlinx.android.synthetic.main.activity_conversation.*
+import android.support.v7.widget.DividerItemDecoration
 
-class ConversationActivity : BaseMMActivity(), View.OnClickListener {
+class ConversationActivity : BaseMMActivity(), View.OnClickListener, Runnable {
 
     val usersRef = FirebaseDatabase.getInstance().reference
     var messages = arrayListOf<Message>()
     var uid = ""
     var them = User()
+    var count = 0
+    lateinit var cAdapter: RecyclerView.Adapter<*>
+    lateinit var manager: LinearLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,14 +36,31 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener {
 
         uid = intent.getStringExtra("uid")
         them = App.users[uid]!!
-        listMessages()
+
+        manager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true)
+
+        val thread = Thread(this)
+        thread.start()
+    }
+
+    override fun run() {
+        while(true) {
+            val total = App.user.conversations.messageList[uid]!!.messages.size
+            if(total != count) {
+                count = total
+                runOnUiThread {
+                    listMessages()
+                }
+            }
+            Thread.sleep(2500)
+        }
     }
 
     private fun listMessages() {
-        messages = arrayListOf()
+        messages.removeAll(messages)
         if (App.user.conversations.messageList.contains(uid)) {
             // sort and remove old messages
-            messages = Utils.sortMessage(App.user.conversations.messageList[uid]!!.messages, uid)
+            messages.addAll(Utils.sortMessage(App.user.conversations.messageList[uid]!!.messages, uid))
 
             // remove messages from db
             val usersRef = FirebaseDatabase.getInstance().reference.child("USERS/${App.user.uid}/conversations/messageList/$uid/messages")
@@ -50,27 +71,13 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener {
     }
 
     private fun buildList() {
-        conv_list_msgs.removeAllViews()
-        for (msg in messages) {
-            val view = LayoutInflater.from(this).inflate(R.layout.item_message, conv_list_msgs as ViewGroup, false)
-
-            view.findViewById<TextView>(R.id.msg_text_msg).text = msg.text
-            view.findViewById<TextView>(R.id.msg_text_sender).text = "UID: ${msg.sender_id}"
-            view.findViewById<TextView>(R.id.msg_text_date).text = msg.dateTime
-
-            var user = App.user
-            if (msg.sender_id == uid) {
-                user = them
-            }
-            view.findViewById<TextView>(R.id.msg_text_sender).text = "${user.firstName} ${user.lastName}"
-
-            if (msg.sender_id == App.user.uid) {
-                view.setBackgroundColor(Color.parseColor("#EEEEEE"))
-            }
-            conv_list_msgs.addView(view)
-            conv_list_msgs.addView(LayoutInflater.from(this).inflate(R.layout.spacer, conv_list_msgs as ViewGroup, false))
+        cAdapter = ConvAdapter(messages.toTypedArray())
+        val recyclerView = findViewById<RecyclerView>(R.id.conv_list_msgs).apply {
+            setHasFixedSize(true)
+            layoutManager = manager
+            adapter = cAdapter
         }
-        conv_scroll.post { conv_scroll.fullScroll(View.FOCUS_DOWN) }
+        recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.context, manager.orientation))
     }
 
     override fun onClick(v: View?) {
@@ -81,8 +88,6 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener {
                 var newMsg =  Message("${App.user.firstName} ${App.user.lastName}", App.user.uid, message, Utils.getDate(Utils.messageFormat), System.currentTimeMillis() / 1000.0)
                 addMessage(newMsg, App.user, them)
                 addMessage(newMsg, them, App.user)
-                messages.add(newMsg)
-                buildList()
             }
         }
     }
@@ -120,5 +125,31 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener {
             }
             else -> return super.onOptionsItemSelected(item)
         }
+    }
+
+    class ConvAdapter(private val data: Array<Message>): RecyclerView.Adapter<ConvAdapter.ViewHolder>() {
+        class ViewHolder(val layout: LinearLayout): RecyclerView.ViewHolder(layout)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_message, parent, false) as LinearLayout
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val view = holder.layout
+            val msg = data[position]
+            view.findViewById<TextView>(R.id.msg_text_msg).text = msg.text
+            view.findViewById<TextView>(R.id.msg_text_sender).text = "UID: ${msg.sender_id}"
+            view.findViewById<TextView>(R.id.msg_text_date).text = msg.dateTime
+
+            var user = App.users[msg.sender_id]!!
+            view.findViewById<TextView>(R.id.msg_text_sender).text = "${user.firstName} ${user.lastName}"
+
+            if (msg.sender_id == App.user.uid) {
+                view.setBackgroundColor(Color.parseColor("#EEEEEE"))
+            }
+        }
+
+        override fun getItemCount(): Int = data.size
     }
 }
