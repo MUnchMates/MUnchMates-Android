@@ -1,6 +1,7 @@
 package com.munchmates.android.Activities
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -13,7 +14,6 @@ import com.munchmates.android.DatabaseObjs.Message
 import com.munchmates.android.DatabaseObjs.MsgObj
 import com.munchmates.android.DatabaseObjs.Sender
 import com.munchmates.android.DatabaseObjs.User
-import com.munchmates.android.Firebase.LoadingDialog
 import com.munchmates.android.R
 import com.munchmates.android.Utils
 import kotlinx.android.synthetic.main.activity_conversation.*
@@ -38,7 +38,12 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener {
     private fun listMessages() {
         messages = arrayListOf()
         if (App.user.conversations.messageList.contains(uid)) {
-            messages = Utils.sortMessage(App.user.conversations.messageList[uid]!!.messages)
+            // sort and remove old messages
+            messages = Utils.sortMessage(App.user.conversations.messageList[uid]!!.messages, uid)
+
+            // remove messages from db
+            val usersRef = FirebaseDatabase.getInstance().reference.child("USERS/${App.user.uid}/conversations/messageList/$uid/messages")
+            usersRef.setValue(App.user.conversations.messageList[uid]!!.messages)
         }
 
         buildList()
@@ -65,6 +70,7 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener {
             conv_list_msgs.addView(view)
             conv_list_msgs.addView(LayoutInflater.from(this).inflate(R.layout.spacer, conv_list_msgs as ViewGroup, false))
         }
+        conv_scroll.post { conv_scroll.fullScroll(View.FOCUS_DOWN) }
     }
 
     override fun onClick(v: View?) {

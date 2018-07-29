@@ -1,5 +1,6 @@
 package com.munchmates.android
 
+import com.google.firebase.database.FirebaseDatabase
 import com.munchmates.android.DatabaseObjs.Message
 import com.munchmates.android.DatabaseObjs.Sender
 import java.text.SimpleDateFormat
@@ -29,9 +30,13 @@ class Utils {
             return sorted
         }
 
-        fun sortMessage(messages: HashMap<String, Message>): ArrayList<Message> {
+        fun sortMessage(messages: HashMap<String, Message>, uid: String): ArrayList<Message> {
             val unsorted = HashMap(messages)
+            val filtered = hashMapOf<String, Message>()
             val sorted = arrayListOf<Message>()
+            val delta = messages.size - 20
+
+            var i = 0
             while(unsorted.size > 0) {
                 var lowest = ""
                 var timestamp = 0.0
@@ -41,8 +46,21 @@ class Utils {
                         lowest = message.key
                     }
                 }
-                sorted.add(unsorted[lowest]!!)
+
+                if(i >= delta) {
+                    filtered[lowest] = unsorted[lowest]!!
+                    sorted.add(unsorted[lowest]!!)
+                }
+                else if(uid.isNullOrEmpty()) {
+                    sorted.add(unsorted[lowest]!!)
+                }
                 unsorted.remove(lowest)
+                i++
+            }
+
+            // remove oldest messages
+            if(!uid.isNullOrEmpty()) {
+                App.user.conversations.messageList[uid]!!.messages = filtered
             }
             return sorted
         }
