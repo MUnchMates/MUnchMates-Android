@@ -37,6 +37,15 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener, Runnable {
         uid = intent.getStringExtra("uid")
         them = App.users[uid]!!
 
+        if(App.users[uid]!!.muteMode) {
+            conv_text_mute.visibility = View.VISIBLE
+            conv_layout_new.visibility = View.GONE
+        }
+        else {
+            conv_text_mute.visibility = View.GONE
+            conv_layout_new.visibility = View.VISIBLE
+        }
+
         manager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true)
 
         val thread = Thread(this)
@@ -86,8 +95,10 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener, Runnable {
                 val message = conv_edit_msg.text.toString()
                 conv_edit_msg.setText("")
                 var newMsg =  Message("${App.user.firstName} ${App.user.lastName}", App.user.uid, message, Utils.getDate(Utils.messageFormat), System.currentTimeMillis() / 1000.0)
-                addMessage(newMsg, App.user, them)
-                addMessage(newMsg, them, App.user)
+                if(!App.users[uid]!!.muteMode && message.isNotEmpty()) {
+                    addMessage(newMsg, App.user, them)
+                    addMessage(newMsg, them, App.user)
+                }
             }
         }
     }

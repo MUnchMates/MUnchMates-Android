@@ -14,6 +14,7 @@
     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#80808080" />
 
     <LinearLayout
+        android:id="@+id/conv_layout_new"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#EEEEEE"
@@ -34,5 +35,15 @@
             android:src="@drawable/ic_send_black_24dp" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/conv_text_mute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:textColor="@android:color/white"
+        android:background="@color/red_500"
+        android:padding="8dp"
+        android:text="@string/muted"/>
 
 </LinearLayout>

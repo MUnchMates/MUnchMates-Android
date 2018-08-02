@@ -38,6 +38,7 @@
 
     <string name="m">M</string>
     <string name="spacer">\@</string>
+    <string name="muted">This user has MUte Mode turned on. They cannot be sent messages.</string>
 
     <string-array name="groups">
         <item>club / organization</item>
