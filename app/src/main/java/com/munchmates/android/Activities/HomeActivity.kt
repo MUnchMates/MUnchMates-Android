@@ -98,6 +98,12 @@ class HomeActivity : BaseMMActivity(), View.OnClickListener, AdapterView.OnItemS
                     names.add(plan.mealPlanName)
                 }
             }
+            4 -> { //home town
+                names.add(App.user.city)
+            }
+            5 -> { //state / country
+                names.add(App.user.stateCountry)
+            }
         }
         val gAdapter = ArrayAdapter(this, R.layout.item_link, names)
         gAdapter.setDropDownViewResource(R.layout.item_spinner)

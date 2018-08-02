@@ -59,6 +59,12 @@ class SearchActivity : BaseMMActivity(), View.OnClickListener {
             3 -> { //meal plan
                 usersRef.orderByChild("mealPlan").equalTo(group == "Yes").addValueEventListener(dialog)
             }
+            4 -> { //hometown
+                usersRef.orderByChild("city").equalTo(group).addValueEventListener(dialog)
+            }
+            5 -> { //state / country
+                usersRef.orderByChild("stateCountry").equalTo(group).addValueEventListener(dialog)
+            }
         }
     }
 
