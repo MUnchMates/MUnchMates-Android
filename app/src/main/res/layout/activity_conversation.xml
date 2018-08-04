@@ -25,7 +25,9 @@
             android:id="@+id/conv_edit_msg"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:maxLength="160"
+            android:inputType="textCapSentences|textAutoCorrect|textAutoComplete|textShortMessage" />
 
         <ImageView
             android:id="@+id/conv_button_send"
