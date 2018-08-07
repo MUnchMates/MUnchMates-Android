@@ -99,12 +99,13 @@ class HomeActivity : BaseMMActivity(), View.OnClickListener, AdapterView.OnItemS
                 }
             }
             4 -> { //home town
-                names.add(App.user.city)
+                names.addAll(App.towns)
             }
             5 -> { //state / country
-                names.add(App.user.stateCountry)
+                names.addAll(App.states)
             }
         }
+        names.sort()
         val gAdapter = ArrayAdapter(this, R.layout.item_link, names)
         gAdapter.setDropDownViewResource(R.layout.item_spinner)
         home_spinner_group.adapter = gAdapter

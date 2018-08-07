@@ -60,10 +60,28 @@ class SearchActivity : BaseMMActivity(), View.OnClickListener {
                 usersRef.orderByChild("mealPlan").equalTo(group == "Yes").addValueEventListener(dialog)
             }
             4 -> { //hometown
-                usersRef.orderByChild("city").equalTo(group).addValueEventListener(dialog)
+                val users = arrayListOf<User>()
+                for (user in App.users.values) {
+                    if(user.city.toUpperCase().trim() == group) users.add(user)
+                }
+                App.searches["$type:$group"] = users
+                displayResults(users)
             }
             5 -> { //state / country
-                usersRef.orderByChild("stateCountry").equalTo(group).addValueEventListener(dialog)
+                val users = arrayListOf<User>()
+                for (user in App.users.values) {
+                    var state = user.stateCountry.toUpperCase().trim()
+                    for(stateBoth in App.context.resources.getStringArray(R.array.us_states)) {
+                        val parts = stateBoth.split(",")
+                        if(state == parts[1]) {
+                            state = parts[0].toUpperCase()
+                            break
+                        }
+                    }
+                    if(state == group) users.add(user)
+                }
+                App.searches["$type:$group"] = users
+                displayResults(users)
             }
         }
     }

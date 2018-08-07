@@ -1,6 +1,7 @@
 package com.munchmates.android
 
 import android.app.Activity
+import android.content.Context
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -19,11 +20,15 @@ class App {
         var plans = arrayListOf<MPlanType>()
         var users = hashMapOf<String, User>()
         var user = User()
+        var towns = setOf<String>()
+        var states = setOf<String>()
+        lateinit var context: Activity
 
         var searches = hashMapOf<String, ArrayList<User>>()
 
         fun init(uid: String, c: Activity) {
             val dialog = LoadingDialog(::respond)
+            context = c
             dialog.show(c.fragmentManager.beginTransaction(), "dialog")
             FirebaseDatabase.getInstance().reference.child("LISTS/clubsOrgs").addListenerForSingleValueEvent(dialog)
             FirebaseDatabase.getInstance().reference.child("LISTS/colleges").addListenerForSingleValueEvent(dialog)
@@ -71,15 +76,29 @@ class App {
             }
             else if(refStr.endsWith("USERS")) {
                 users = hashMapOf()
+                towns = setOf()
+                states = setOf()
                 for(type in snapshot.children) {
                     try {
                         val user = type.getValue<User>(User::class.java)!!
+                        towns = towns.plus(user.city.toUpperCase().trim())
+                        var state = user.stateCountry.toUpperCase().trim()
+                        for(stateBoth in context.resources.getStringArray(R.array.us_states)) {
+                            val parts = stateBoth.split(",")
+                            if(state == parts[1]) {
+                                state = parts[0].toUpperCase()
+                                break
+                            }
+                        }
+                        states = states.plus(state)
                         users[user.uid] = user
                     } catch (e: DatabaseException) {
                         println("Bad value on new user:")
                         println(type.value)
                     }
                 }
+                towns = towns.minus("")
+                states = states.minus("")
             }
             else if(refStr.contains("USERS")) {
                 user = snapshot.getValue<User>(User::class.java)!!

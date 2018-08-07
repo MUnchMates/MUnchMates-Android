@@ -45,5 +45,68 @@
         <item>college</item>
         <item>mate type</item>
         <item>meal plan</item>
+        <item>hometown</item>
+        <item>state / country</item>
+    </string-array>
+
+    <string-array name="us_states">
+        <item>Alabama,AL</item>
+        <item>Alaska,AK</item>
+        <item>American Samoa,AS</item>
+        <item>Arizona,AZ</item>
+        <item>Arkansas,AR</item>
+        <item>California,CA</item>
+        <item>Colorado,CO</item>
+        <item>Connecticut,CT</item>
+        <item>Delaware,DE</item>
+        <item>District of Columbia,DC</item>
+        <item>Florida,FL</item>
+        <item>Georgia,GA</item>
+        <item>Guam,GU</item>
+        <item>Hawaii,HI</item>
+        <item>Idaho,ID</item>
+        <item>Illinois,IL</item>
+        <item>Indiana,IN</item>
+        <item>Iowa,IA</item>
+        <item>Kansas,KS</item>
+        <item>Kentucky,KY</item>
+        <item>Louisiana,LA</item>
+        <item>Maine,ME</item>
+        <item>Maryland,MD</item>
+        <item>Massachusetts,MH</item>
+        <item>Michigan,MI</item>
+        <item>Micronesia,FM</item>
+        <item>Minnesota,MN</item>
+        <item>Mississippi,MS</item>
+        <item>Missouri,MO</item>
+        <item>Montana,MT</item>
+        <item>Nebraska,NE</item>
+        <item>Nevada,NV</item>
+        <item>New Hampshire,NH</item>
+        <item>New Jersey,NJ</item>
+        <item>New Mexico,NM</item>
+        <item>New York,NY</item>
+        <item>North Carolina,NC</item>
+        <item>North Dakota,ND</item>
+        <item>Northern Marianas Islands,MP</item>
+        <item>Ohio,OH</item>
+        <item>Oklahoma,OK</item>
+        <item>Oregon,OR</item>
+        <item>Palau,PW</item>
+        <item>Pennsylvania,PA</item>
+        <item>Puerto Rico,PR</item>
+        <item>Rhode Island,RI</item>
+        <item>South Carolina,SC</item>
+        <item>South Dakota,SD</item>
+        <item>Tennessee,TN</item>
+        <item>Texas,TX</item>
+        <item>Utah,UT</item>
+        <item>Vermont,VT</item>
+        <item>Virginia,VA</item>
+        <item>Virgin Islands,VI</item>
+        <item>Washington,WA</item>
+        <item>West Virginia,WV</item>
+        <item>Wisconsin,WI</item>
+        <item>Wyoming,WY</item>
     </string-array>
 </resources>
