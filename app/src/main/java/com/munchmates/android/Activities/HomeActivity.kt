@@ -57,7 +57,7 @@ class HomeActivity : BaseMMActivity(), View.OnClickListener, AdapterView.OnItemS
         checkVerification()
     }
 
-    public fun checkVerification() {
+    fun checkVerification() {
         if(!FirebaseAuth.getInstance().currentUser!!.isEmailVerified) {
             val dialog = VerifyDialog()
             dialog.show(fragmentManager.beginTransaction(), "dialog")

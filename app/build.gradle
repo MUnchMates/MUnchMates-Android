@@ -8,8 +8,8 @@ android {
         applicationId "com.munchmates.android"
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 7
-        versionName "Alpha Preview 5"
+        versionCode 8
+        versionName "Alpha Preview 6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
