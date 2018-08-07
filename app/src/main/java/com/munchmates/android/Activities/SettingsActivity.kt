@@ -197,11 +197,8 @@ class SettingsActivity : BaseMMActivity(), View.OnClickListener {
                 val user = App.user
                 user.firstName = settings_edit_first.text.toString().trim()
                 user.lastName = settings_edit_last.text.toString().trim()
-                user.city = settings_edit_town.text.toString().replace(".", "").trim()
-                if(user.city.contains(',')) {
-                    user.city = user.city.substring(0, user.city.indexOf(',')).trim()
-                }
-                user.stateCountry = settings_edit_state.text.toString().trim()
+                user.city = settings_edit_town.text.toString()
+                user.stateCountry = settings_edit_state.text.toString()
                 user.mateType = settings_spinner_type.selectedItem as String
                 user.college = settings_spinner_school.selectedItem as String
                 user.muteMode = settings_switch_mute.isChecked

@@ -2,7 +2,6 @@ package com.munchmates.android.Activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -13,9 +12,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.munchmates.android.App
 import com.munchmates.android.R
 import com.munchmates.android.Utils
+import com.munchmates.android.VerifyDialog
 import kotlinx.android.synthetic.main.activity_home.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 class HomeActivity : BaseMMActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
 
@@ -54,6 +52,15 @@ class HomeActivity : BaseMMActivity(), View.OnClickListener, AdapterView.OnItemS
         }
         else {
             home_button_messages.text = "Messages"
+        }
+
+        checkVerification()
+    }
+
+    public fun checkVerification() {
+        if(!FirebaseAuth.getInstance().currentUser!!.isEmailVerified) {
+            val dialog = VerifyDialog()
+            dialog.show(fragmentManager.beginTransaction(), "dialog")
         }
     }
 
