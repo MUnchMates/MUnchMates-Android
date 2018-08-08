@@ -36,6 +36,7 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener, Runnable {
 
         uid = intent.getStringExtra("uid")
         them = App.users[uid]!!
+        title = "${them.firstName} ${them.lastName}"
 
         if(App.users[uid]!!.muteMode) {
             conv_text_mute.visibility = View.VISIBLE
@@ -54,14 +55,16 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener, Runnable {
 
     override fun run() {
         while(true) {
-            val total = App.user.conversations.messageList[uid]!!.messages.size
-            if(total != count) {
-                count = total
-                runOnUiThread {
-                    listMessages()
+            if(App.user.conversations.messageList[uid] != null) {
+                val total = App.user.conversations.messageList[uid]!!.messages.size
+                if(total != count) {
+                    count = total
+                    runOnUiThread {
+                        listMessages()
+                    }
                 }
+                Thread.sleep(2500)
             }
-            Thread.sleep(2500)
         }
     }
 
