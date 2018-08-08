@@ -27,10 +27,15 @@ class MessageActivity : BaseMMActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
         title = "Messages"
+    }
+
+    override fun onResume() {
+        super.onResume()
         getMessages()
     }
 
     private fun getMessages() {
+        senders = arrayListOf()
         val sorted = Utils.sortSender(App.user.conversations.senderList)
         for(sender in sorted) {
             senders.add(sender)

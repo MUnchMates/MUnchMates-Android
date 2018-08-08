@@ -28,6 +28,8 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener, Runnable {
     var count = 0
     lateinit var cAdapter: RecyclerView.Adapter<*>
     lateinit var manager: LinearLayoutManager
+    lateinit var thread: Thread
+    var running = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +37,10 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener, Runnable {
         conv_button_send.setOnClickListener(this)
 
         uid = intent.getStringExtra("uid")
+    }
+
+    override fun onResume() {
+        super.onResume()
         them = App.users[uid]!!
         title = "${them.firstName} ${them.lastName}"
 
@@ -49,12 +55,18 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener, Runnable {
 
         manager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true)
 
-        val thread = Thread(this)
+        thread = Thread(this)
+        running = true
         thread.start()
     }
 
+    override fun onPause() {
+        super.onPause()
+        running = false
+    }
+
     override fun run() {
-        while(true) {
+        while(running) {
             if(App.user.conversations.messageList[uid] != null) {
                 val total = App.user.conversations.messageList[uid]!!.messages.size
                 if(total != count) {

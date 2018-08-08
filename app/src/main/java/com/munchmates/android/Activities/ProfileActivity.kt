@@ -33,9 +33,19 @@ class ProfileActivity : BaseMMActivity(), View.OnClickListener {
         profile_button_add.setOnClickListener(this)
 
         uid = intent.getStringExtra("uid")
-        user = App.users[uid]!!
         println("UID: $uid")
+    }
 
+    override fun onResume() {
+        super.onResume()
+        user = when(uid == FirebaseAuth.getInstance().uid) {
+            true -> App.user
+            false -> App.users[uid]!!
+        }
+        fillPage()
+    }
+
+    private fun fillPage() {
         if(uid != FirebaseAuth.getInstance().currentUser?.uid) {
             profile_button_add.visibility = View.GONE
             title = "${user.firstName} ${user.lastName}"
@@ -44,10 +54,6 @@ class ProfileActivity : BaseMMActivity(), View.OnClickListener {
             title = "Your Profile"
         }
 
-        fillPage()
-    }
-
-    private fun fillPage() {
         profile_text_name.text = "${user.firstName} ${user.lastName}"
         if(user.city.isEmpty() && user.stateCountry.isEmpty()) {
             profile_text_town.visibility = View.GONE

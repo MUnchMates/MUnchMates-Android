@@ -20,6 +20,10 @@ class ClubActivity : BaseMMActivity(), CompoundButton.OnCheckedChangeListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
         title = "Select Clubs"
+    }
+
+    override fun onResume() {
+        super.onResume()
         load()
     }
 
