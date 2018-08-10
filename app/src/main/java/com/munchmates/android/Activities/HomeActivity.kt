@@ -16,7 +16,6 @@ import com.munchmates.android.VerifyDialog
 import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : BaseMMActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -54,12 +53,15 @@ class HomeActivity : BaseMMActivity(), View.OnClickListener, AdapterView.OnItemS
             home_button_messages.text = "Messages"
         }
 
-        checkVerification()
+        checkVerification(0)
     }
 
-    fun checkVerification() {
+    fun checkVerification(last: Long) {
         if(!FirebaseAuth.getInstance().currentUser!!.isEmailVerified) {
             val dialog = VerifyDialog()
+            val args = Bundle()
+            args.putLong("last", last)
+            dialog.arguments = args
             dialog.show(fragmentManager.beginTransaction(), "dialog")
         }
     }
