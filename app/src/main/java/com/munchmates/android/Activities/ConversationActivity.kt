@@ -19,6 +19,12 @@ import com.munchmates.android.Utils
 import kotlinx.android.synthetic.main.activity_conversation.*
 import android.support.v7.widget.DividerItemDecoration
 
+/**
+ * This uses Recycler Views...
+ * I haven't done these before so it may be jank...
+ * Please fix if you know how to do better...
+ * Particularly with adding new items
+ */
 class ConversationActivity : BaseMMActivity(), View.OnClickListener, Runnable {
 
     val usersRef = FirebaseDatabase.getInstance().reference
@@ -100,6 +106,9 @@ class ConversationActivity : BaseMMActivity(), View.OnClickListener, Runnable {
             setHasFixedSize(true)
             layoutManager = manager
             adapter = cAdapter
+        }
+        for(i in 0 until recyclerView.itemDecorationCount) {
+            recyclerView.removeItemDecorationAt(i)
         }
         recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.context, manager.orientation))
     }
