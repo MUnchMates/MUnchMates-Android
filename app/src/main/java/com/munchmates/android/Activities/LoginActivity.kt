@@ -29,6 +29,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         login_button_forgot.setOnClickListener(this)
         title = "MunchMates Login"
 
+        if(Prefs.instance != null) {
+            Prefs.setInstance(this)
+        }
+
         val email = Prefs.instance.getStr(Prefs.EMAIL_PREF)
         val password = Prefs.instance.getStr(Prefs.PASSWORD_PREF)
         if(email != "" && password != "") {
